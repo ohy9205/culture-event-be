@@ -1,5 +1,6 @@
 const { Event } = require("../models");
 const axios = require("axios");
+const { Op } = require("sequelize");
 
 const currentDate = () => {
   return new Date().toISOString().slice(0, 10);
@@ -7,6 +8,22 @@ const currentDate = () => {
 
 // NOTE DB 초기화, 서버 초기화 후 한 번만 실행하는 함수
 // 여러 번 실행하면, 같은 이벤트가 중복되어 저장됨.
+
+exports.getInitialData = async () => {
+  Event.count()
+    .then((count) => {
+      if (count === 0) {
+        console.log("테이블에 데이터가 없습니다. 초기화를 실행합니다");
+        this.getEventData();
+      } else {
+        console.log(`테이블에 ${count}개의 데이터가 있습니다.`);
+      }
+    })
+    .catch((err) => {
+      console.error("데이터 수 조회중 오류 발생", err);
+    });
+};
+
 exports.getEventData = async () => {
   const response = await axios.get(
     `http://openapi.seoul.go.kr:8088/${process.env.API_KEY}/json/culturalEventInfo/1/1000`
@@ -35,6 +52,64 @@ exports.getEventData = async () => {
       longitude: event.LOT,
       isFree: event.IS_FREE === "무료" ? true : false,
       thumbnail: event.MAIN_IMG,
+      startDate: event.STRTDATE.split(" ")[0],
+      endDate: event.END_DATE.split(" ")[0],
+    });
+  });
+};
+
+const destroyData = async () => {
+  await Event.findAll({
+    where: {
+      endDate: {
+        [Op.lt]: currentDate(),
+      },
+    },
+  }).then((expiredEvent) => {
+    if (expiredEvent.length > 0) {
+      expiredEvent.forEach((event) => {
+        event.destroy();
+      });
+      console.log(`${expiredEvent.length}개의 이벤트가 삭제되었습니다.`);
+    } else {
+      console.log("기간이 지난 이벤트가 없습니다.");
+    }
+  });
+};
+
+exports.getNewEventData = async () => {
+  console.log("new data");
+
+  destroyData();
+
+  const response = await axios.get(
+    `http://openapi.seoul.go.kr:8088/${process.env.API_KEY}/json/culturalEventInfo/1/1000`
+  );
+  const eventData = response.data.culturalEventInfo.row;
+
+  const newEvent = eventData.filter(
+    (data) => data.RGSTDATE.split(" ")[0] === currentDate()
+  );
+  newEvent.map(async (event) => {
+    Event.create({
+      category: event.CODENAME,
+      location: event.GUNAME,
+      title: event.TITLE,
+      eventPeriod: event.DATE,
+      place: event.PLACE,
+      hostOrganization: event.ORG_NAME,
+      targetAudience: event.USE_TRGT,
+      fee: event.USE_FEE,
+      performerInfo: event.PLAYER,
+      programInfo: event.PROGRAM,
+      otherInfo: event.ETC_DESC,
+      homePage: event.ORG_LINK,
+      latitude: event.LAT,
+      longitude: event.LOT,
+      isFree: event.IS_FREE === "무료" ? true : false,
+      thumbnail: event.MAIN_IMG,
+      startDate: event.STRTDATE.split(" ")[0],
+      endDate: event.END_DATE.split(" ")[0],
     });
   });
 };

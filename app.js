@@ -11,8 +11,9 @@ dotenv.config();
 
 // NOTE DB 설정, Passport 설정
 const { sequelize } = require("./models");
-const { getEventData } = require("./utils/getEventData");
+const { getInitialData } = require("./utils/getEventData");
 const v1 = require("./routes/v1");
+const { dailyTask } = require("./utils/dailyTask");
 const app = express();
 // passportConfig();
 app.set("port", process.env.PORT || 3030);
@@ -35,7 +36,11 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.use("/v1", v1);
 
-// getEventData();
+setTimeout(() => {
+  getInitialData();
+}, 1000);
+
+dailyTask();
 
 app.use((req, res, next) => {
   const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);

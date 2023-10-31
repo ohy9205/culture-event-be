@@ -68,6 +68,14 @@ class Event extends Sequelize.Model {
           type: Sequelize.TEXT,
           allowNull: false,
         },
+        startDate: {
+          type: Sequelize.STRING(30),
+          allowNull: false,
+        },
+        endDate: {
+          type: Sequelize.STRING(30),
+          allowNull: false,
+        },
         favorite: {
           type: Sequelize.INTEGER,
           defaultValue: 0,
