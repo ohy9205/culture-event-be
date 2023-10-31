@@ -5,54 +5,58 @@ class Event extends Sequelize.Model {
     Event.init(
       {
         category: {
-          type: Sequelize.STRING(20),
+          type: Sequelize.STRING(300),
+          allowNull: false,
+        },
+        location: {
+          type: Sequelize.STRING(300),
           allowNull: false,
         },
         title: {
           type: Sequelize.TEXT,
           allowNull: false,
         },
-        event_period: {
-          type: Sequelize.STRING(20),
+        eventPeriod: {
+          type: Sequelize.STRING(300),
           allowNull: false,
         },
         place: {
-          type: Sequelize.STRING(20),
+          type: Sequelize.STRING(300),
           allowNull: false,
         },
-        host_organization: {
-          type: Sequelize.STRING(20),
+        hostOrganization: {
+          type: Sequelize.STRING(300),
           allowNull: false,
         },
-        target_audience: {
-          type: Sequelize.STRING(100),
+        targetAudience: {
+          type: Sequelize.STRING(300),
           allowNull: false,
         },
         fee: {
-          type: Sequelize.STRING(50),
+          type: Sequelize.STRING(300),
           allowNull: true,
         },
-        performer_info: {
-          type: Sequelize.STRING(100),
+        performerInfo: {
+          type: Sequelize.STRING(300),
           allowNull: true,
         },
-        program_info: {
-          type: Sequelize.STRING(100),
+        programInfo: {
+          type: Sequelize.TEXT,
           allowNull: true,
         },
-        other_info: {
-          type: Sequelize.STRING(100),
+        otherInfo: {
+          type: Sequelize.TEXT,
           allowNull: true,
         },
-        home_page: {
+        homePage: {
           type: Sequelize.TEXT,
           allowNull: false,
         },
-        lat: {
+        latitude: {
           type: Sequelize.STRING(30),
           allowNull: false,
         },
-        lng: {
+        longitude: {
           type: Sequelize.STRING(30),
           allowNull: false,
         },
