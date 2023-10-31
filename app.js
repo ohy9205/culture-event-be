@@ -12,8 +12,7 @@ dotenv.config();
 // NOTE DB 설정, Passport 설정
 const { sequelize } = require("./models");
 const { getEventData } = require("./utils/getEventData");
-const { v1 } = require("./routes/v1");
-
+const v1 = require("./routes/v1");
 const app = express();
 // passportConfig();
 app.set("port", process.env.PORT || 3030);
@@ -49,4 +48,8 @@ app.use((err, req, res, next) => {
   res.locals.error = process.env.NODE_ENV !== "production" ? err : {};
   res.status(err.status || 500);
   res.send(err);
+});
+
+app.listen(app.get("port"), () => {
+  console.log(app.get("port"), "번 포트에서 대기 중");
 });
