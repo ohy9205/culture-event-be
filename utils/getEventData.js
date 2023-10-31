@@ -5,6 +5,8 @@ const currentDate = () => {
   return new Date().toISOString().slice(0, 10);
 };
 
+// NOTE DB 초기화, 서버 초기화 후 한 번만 실행하는 함수
+// 여러 번 실행하면, 같은 이벤트가 중복되어 저장됨.
 exports.getEventData = async () => {
   const response = await axios.get(
     `http://openapi.seoul.go.kr:8088/${process.env.API_KEY}/json/culturalEventInfo/1/1000`

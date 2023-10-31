@@ -12,6 +12,7 @@ dotenv.config();
 // NOTE DB 설정, Passport 설정
 const { sequelize } = require("./models");
 const { getEventData } = require("./utils/getEventData");
+const { v1 } = require("./routes/v1");
 
 const app = express();
 // passportConfig();
@@ -32,6 +33,8 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
+
+app.use("/v1", v1);
 
 // getEventData();
 
