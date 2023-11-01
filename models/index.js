@@ -12,6 +12,8 @@ const sequelize = new Sequelize(
   config
 );
 
+console.log("config", config.database, config.username, config.password);
+
 db.sequelize = sequelize;
 db.Event = Event;
 
