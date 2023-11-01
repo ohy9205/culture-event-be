@@ -37,7 +37,7 @@ class Event extends Sequelize.Model {
           allowNull: true,
         },
         performerInfo: {
-          type: Sequelize.STRING(300),
+          type: Sequelize.TEXT,
           allowNull: true,
         },
         programInfo: {
