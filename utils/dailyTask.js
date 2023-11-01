@@ -1,7 +1,7 @@
 const { getEventData, getNewEventData } = require("./getEventData");
 
-const refreshHour = 9;
-const refreshMinute = 10;
+const refreshHour = 10;
+const refreshMinute = 5;
 
 exports.dailyTask = () => {
   console.log("dailyTask Running!");
