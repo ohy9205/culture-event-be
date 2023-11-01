@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "cross-env NODE_ENV=production node app.js",
+    "start": "cross-env NODE_ENV=production node app.js --host 0.0.0.0 --port 8080",
     "dev": "nodemon app"
   },
   "dependencies": {
