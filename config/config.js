@@ -19,7 +19,7 @@ module.exports = {
     username: "root",
     password: process.env.DATABASE_PASSWORD,
     database: "railway",
-    host: "viaduct.proxy.rlwy.net",
+    host: "viaduct.proxy.rlwy.net:3306",
     dialect: "mysql",
   },
 };
