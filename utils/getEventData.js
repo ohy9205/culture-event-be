@@ -80,7 +80,7 @@ const destroyData = async () => {
 exports.getNewEventData = async () => {
   console.log("new data");
 
-  destroyData();
+  await destroyData();
 
   const response = await axios.get(
     `http://openapi.seoul.go.kr:8088/${process.env.API_KEY}/json/culturalEventInfo/1/1000`

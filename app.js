@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const morgan = require("morgan");
 const session = require("express-session");
 const dotenv = require("dotenv");
+const schedule = require("node-schedule");
 
 dotenv.config();
 
@@ -11,18 +12,25 @@ dotenv.config();
 
 // NOTE DB 설정, Passport 설정
 const { sequelize } = require("./models");
-const { getInitialData } = require("./utils/getEventData");
+const { getNewEventData, getInitialData } = require("./utils/getEventData");
 const v1 = require("./routes/v1");
-const { dailyTask } = require("./utils/dailyTask");
 const app = express();
 // passportConfig();
 app.set("port", process.env.PORT || 3030);
+
+const scheduleTime =
+  process.env.NODE_ENV === "production" ? "'30 0 * * *'" : "'30 9 * * *'";
+
+console.log("scheduleTime", scheduleTime);
+
+const job = schedule.scheduleJob(scheduleTime, getNewEventData);
 
 // NOTE DB 연결
 sequelize
   .sync({ force: false })
   .then(() => {
     console.log("데이터베이스 연결 성공");
+    getInitialData();
   })
   .catch((err) => {
     console.error(err);
@@ -39,12 +47,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.use("/v1", v1);
-
-setTimeout(() => {
-  getInitialData();
-}, 1000);
-
-dailyTask();
 
 app.use((req, res, next) => {
   const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
