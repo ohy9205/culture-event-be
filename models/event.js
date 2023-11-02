@@ -76,7 +76,7 @@ class Event extends Sequelize.Model {
           type: Sequelize.STRING(30),
           allowNull: false,
         },
-        favorite: {
+        views: {
           type: Sequelize.INTEGER,
           defaultValue: 0,
         },
