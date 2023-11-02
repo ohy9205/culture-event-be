@@ -1,8 +1,13 @@
 const { Event } = require("../models");
 const { Op } = require("sequelize");
 
+const currentDate = () => {
+  return new Date().toISOString().slice(0, 10);
+};
+
 exports.getEvents = async (req, res) => {
   if (req.query.pageIndex && req.query.pageSize) {
+    // 페이지네이션 사용
     const pageIndex = Number(req.query.pageIndex);
     const pageSize = Number(req.query.pageSize);
     let offset = 0;
@@ -10,102 +15,80 @@ exports.getEvents = async (req, res) => {
     if (pageIndex > 1) {
       offset = pageSize * (pageIndex - 1);
     }
-    const { category, location, isfree, keyword, start, end } = req.query;
+    const { category, location, isfree, keyword, start, end, latest } =
+      req.query;
+    const orderOption =
+      req.query.orderBy === "views"
+        ? [["views", "DESC"]]
+        : [["startDate", "ASC"]];
 
-    if (category || location || isfree || keyword || start || end) {
-      await Event.findAndCountAll({
-        where: {
-          ...(category && { category }),
-          ...(location && { location }),
-          ...(isfree && { isFree: isfree === "무료" }),
-          ...(keyword && { title: { [Op.like]: `%${keyword}%` } }),
-          ...(start &&
-            end && { startDate: { [Op.gte]: start, [Op.lte]: end } }),
-        },
-        order: [["startDate", "ASC"]],
-        limit: pageSize,
-        offset: offset,
-      })
-        .then((events) => {
-          res.json({
-            code: 200,
-            totalPage: Math.ceil(events.count / pageSize),
-            payload: events,
-          });
-        })
-        .catch((err) => {
-          console.error(err);
-          return res.status(500).json({
-            code: 500,
-            message: "서버 에러?",
-          });
-        });
-    } else {
-      await Event.findAndCountAll({
-        order: [["startDate", "ASC"]],
-        limit: pageSize,
-        offset: offset,
-      })
-        .then((events) => {
-          res.json({
-            code: 200,
-            totalPage: Math.ceil(events.count / pageSize),
-            payload: events,
-          });
-        })
-        .catch((err) => {
-          console.error(err);
-          return res.status(500).json({
-            code: 500,
-            message: "서버 에러?",
-          });
-        });
+    let where = {};
+    if (category) where.category = category;
+    if (location) where.location = location;
+    if (isfree) where.isFree = isfree === "무료";
+    if (keyword) where.title = { [Op.like]: `%${keyword}%` };
+    if (start && end) {
+      where.startDate = { [Op.gte]: start, [Op.lte]: end };
+    } else if (latest === "today") {
+      where.startDate = { [Op.gte]: currentDate() };
     }
+
+    await Event.findAndCountAll({
+      where,
+      order: orderOption,
+      limit: pageSize,
+      offset: offset,
+    })
+      .then((events) => {
+        res.json({
+          code: 200,
+          totalPage: Math.ceil(events.count / pageSize),
+          payload: events,
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        return res.status(500).json({
+          code: 500,
+          message: "서버 에러?",
+        });
+      });
   } else {
-    const { category, location, isfree, keyword, start, end } = req.query;
-    if (category || location || isfree || keyword || start || end) {
-      await Event.findAll({
-        order: [["startDate", "ASC"]],
-        where: {
-          ...(category && { category }),
-          ...(location && { location }),
-          ...(isfree && { isFree: isfree === "무료" }),
-          ...(keyword && { title: { [Op.like]: `%${keyword}%` } }),
-          ...(start &&
-            end && { startDate: { [Op.gte]: start, [Op.lte]: end } }),
-        },
-      })
-        .then((events) => {
-          res.json({
-            code: 200,
-            payload: events,
-          });
-        })
-        .catch((err) => {
-          console.error(err);
-          return res.status(500).json({
-            code: 500,
-            message: "서버 에러?",
-          });
-        });
-    } else {
-      await Event.findAll({
-        order: [["startDate", "ASC"]],
-      })
-        .then((events) => {
-          res.json({
-            code: 200,
-            payload: events,
-          });
-        })
-        .catch((err) => {
-          console.error(err);
-          return res.status(500).json({
-            code: 500,
-            message: "서버 에러?",
-          });
-        });
+    // 페이지네이션 사용 X
+    const { category, location, isfree, keyword, start, end, latest } =
+      req.query;
+    const orderOption =
+      req.query.orderBy === "views"
+        ? [["views", "DESC"]]
+        : [["startDate", "ASC"]];
+
+    let where = {};
+    if (category) where.category = category;
+    if (location) where.location = location;
+    if (isfree) where.isFree = isfree === "무료";
+    if (keyword) where.title = { [Op.like]: `%${keyword}%` };
+    if (start && end) {
+      where.startDate = { [Op.gte]: start, [Op.lte]: end };
+    } else if (latest === "today") {
+      where.startDate = { [Op.gte]: currentDate() };
     }
+    await Event.findAll({
+      order: orderOption,
+      where,
+    })
+      .then((events) => {
+        res.json({
+          code: 200,
+          payload: events,
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        return res.status(500).json({
+          code: 500,
+          message: "서버 에러?",
+        });
+      });
   }
 };
 
@@ -143,4 +126,23 @@ exports.increaseViewCount = async (req, res, next) => {
     console.error(error);
     next(err);
   }
+};
+
+exports.getEventsByViews = async (req, res) => {
+  await Event.findAll({
+    order: ["views", "DESC"],
+  })
+    .then((events) => {
+      res.json({
+        code: 200,
+        payload: events,
+      });
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).json({
+        code: 500,
+        message: "서버 에러?",
+      });
+    });
 };
