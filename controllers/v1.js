@@ -146,3 +146,12 @@ exports.getEventsByViews = async (req, res) => {
       });
     });
 };
+
+exports.createToken = async(req, res) => {
+  const {clientBody} = req.body;
+  try {
+    const domain = await Dom
+  }catch(error) {
+    console.error(error)
+  }
+}
