@@ -3,7 +3,6 @@ const axios = require("axios");
 const { Op } = require("sequelize");
 
 const currentDate = () => {
-  console.log("currentData", new Date().toISOString().slice(0, 10));
   return new Date().toISOString().slice(0, 10);
 };
 
