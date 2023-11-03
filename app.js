@@ -19,7 +19,7 @@ const app = express();
 app.set("port", process.env.PORT || 3030);
 
 const scheduleTime =
-  process.env.NODE_ENV === "production" ? "'30 0 * * *'" : "'30 9 * * *'";
+  process.env.NODE_ENV === "production" ? "'0 10 * * *'" : "'30 9 * * *'";
 
 console.log("scheduleTime", scheduleTime);
 
