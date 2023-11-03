@@ -4,8 +4,14 @@ const {
   getEventsById,
   increaseViewCount,
 } = require("../controllers/v1");
+const cors = require("cors");
 
 const router = express.Router();
+router.use(
+  cors({
+    credentials: true,
+  })
+);
 
 router.get("/events", getEvents);
 
