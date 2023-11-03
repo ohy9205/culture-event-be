@@ -3,6 +3,7 @@ const axios = require("axios");
 const { Op } = require("sequelize");
 
 const currentDate = () => {
+  console.log("currentData", new Date().toISOString().slice(0, 10));
   return new Date().toISOString().slice(0, 10);
 };
 
@@ -79,8 +80,8 @@ const destroyData = async () => {
 
 exports.getNewEventData = async () => {
   console.log("new data");
-
   await destroyData();
+  console.log("destroy data finished");
 
   const response = await axios.get(
     `http://openapi.seoul.go.kr:8088/${process.env.API_KEY}/json/culturalEventInfo/1/1000`

@@ -12,18 +12,25 @@ dotenv.config();
 
 // NOTE DB 설정, Passport 설정
 const { sequelize } = require("./models");
-const { getNewEventData, getInitialData } = require("./utils/getEventData");
+const {
+  getNewEventData,
+  getInitialData,
+  getEventData,
+} = require("./utils/getEventData");
 const v1 = require("./routes/v1");
 const app = express();
 // passportConfig();
 app.set("port", process.env.PORT || 3030);
 
-const scheduleTime =
-  process.env.NODE_ENV === "production" ? "'0 10 * * *'" : "'30 9 * * *'";
+const rule = new schedule.RecurrenceRule();
 
-console.log("scheduleTime", scheduleTime);
+rule.hour = 13;
+rule.minute = 5;
+rule.tz = "Asia/Seoul";
 
-const job = schedule.scheduleJob(scheduleTime, getNewEventData);
+schedule.scheduleJob(rule, function () {
+  getNewEventData();
+});
 
 // NOTE DB 연결
 sequelize
