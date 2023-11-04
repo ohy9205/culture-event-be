@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const passport = require("passport");
+const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
 exports.signUp = async (req, res, next) => {
@@ -28,37 +29,118 @@ exports.signUp = async (req, res, next) => {
   }
 };
 
-exports.signIn = (req, res, next) => {
-  // session 만들고, 토큰도 줘야할거 같은데
-  // passport.authenticate("local", (authError, user, info) => {
-  //   if (authError) {
-  //     console.error(error);
-  //     return next(authError);
-  //   }
-  //   if (!user) {
-  //     return res.json({
-  //       code: 404,
-  //       message: "존재하지 않는 회원입니다.",
-  //     });
-  //   }
-  //   return req.login(user, (signInError) => {
-  //     if (signInError) {
-  //       console.error(signInError);
-  //       return next(signInError);
-  //     }
-  //     return res.json({
-  //       code: 200,
-  //       message: "로그인 성공",
-  //     });
-  //   });
-  // })(req, res, next);
+exports.signIn = async (req, res, next) => {
+  const { email, password } = req.body;
+  try {
+    const exUser = await User.findOne({ where: email });
+    if (!exUser) {
+      return res.json({
+        code: 404,
+        message: "이메일 주소가 잘못되었습니다.",
+      });
+    } else {
+      // 이메일은 존재하고, 비밀번호 인증을 해야 함.
+      const result = await bcrypt.compare(password, exUser.password);
+      if (!result) {
+        return res.json({
+          code: 404,
+          message: "비밀번호가 일치하지 않습니다.",
+        });
+      } else {
+        // token 만들어서 보내기
+        const token = jwt.sign(
+          {
+            id: exUser.id,
+            email: exUser.email,
+          },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: "1m",
+            issuer: "mk",
+          }
+        );
+
+        const refreshToken = jwt.sign(
+          {
+            id: exUser.id,
+            email: exUser.email,
+          },
+          process.env.RT_SECRET,
+          {
+            expiresIn: "15d",
+            issuer: "mk",
+          }
+        );
+        res.json({
+          code: 200,
+          message: "로그인 성공, 토큰 발급",
+          at: token,
+          rt: refreshToken,
+        });
+      }
+    }
+  } catch (error) {
+    console.error(error);
+  }
 };
 
-exports.logout = (req, res) => {
-  // req.logout(() => {
-  //   res.json({
-  //     code: 200,
-  //     message: "로그아웃 성공",
-  //   });
-  // });
+exports.verifyRefreshToken = (req, res, next) => {
+  const token = req.header("Authorization");
+  if (!token) {
+    res.status(401).json({ code: 401, message: "Refresh Token이 없습니다" });
+  }
+
+  jwt.verify(token, process.env.RT_SECRET, (err, decoded) => {
+    if (err) {
+      if (err.name === "TokenExpiredError") {
+        res
+          .status(401)
+          .json({ code: 401, message: "Refresh Token이 만료되었습니다" });
+      } else {
+        res
+          .status(401)
+          .json({ code: 401, message: "토큰 검증에 실패했습니다." });
+      }
+    } else {
+      const expirationDate = new Date(decoded.exp * 1000);
+      const currentDate = new Date();
+      const timeDiff = expirationDate - currentDate;
+
+      const daysUntilExpiration = timeDiff / (1000 * 60 * 60 * 24);
+      const exUserId = decoded.id;
+      const exUserEmail = decoded.email;
+
+      const newAccessToken = jwt.sign(
+        {
+          id: exUserId,
+          email: exUserEmail,
+        },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "1m",
+          issuer: "mk",
+        }
+      );
+
+      if (daysUntilExpiration < 7) {
+        const newRefreshToken = jwt.sign(
+          { id: exUserId, email: exUserEmail },
+          process.env.RT_SECRET,
+          { expiresIn: "15d", issuer: "mk" }
+        );
+        res.status(200).json({
+          code: 200,
+          message: "AccessToken, RefreshToken이 새로 발급되었습니다",
+          at: newAccessToken,
+          rt: newRefreshToken,
+        });
+      } else {
+        res.status(200).json({
+          code: 200,
+          message: "AccessToken이 새로 발급되었습니다",
+          at: newAccessToken,
+        });
+      }
+    }
+  });
 };
