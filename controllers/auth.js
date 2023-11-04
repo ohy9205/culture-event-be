@@ -30,35 +30,35 @@ exports.signUp = async (req, res, next) => {
 
 exports.signIn = (req, res, next) => {
   // session 만들고, 토큰도 줘야할거 같은데
-  passport.authenticate("local", (authError, user, info) => {
-    if (authError) {
-      console.error(error);
-      return next(authError);
-    }
-    if (!user) {
-      return res.json({
-        code: 404,
-        message: "존재하지 않는 회원입니다.",
-      });
-    }
-    return req.login(user, (signInError) => {
-      if (signInError) {
-        console.error(signInError);
-        return next(signInError);
-      }
-      return res.json({
-        code: 200,
-        message: "로그인 성공",
-      });
-    });
-  })(req, res, next);
+  // passport.authenticate("local", (authError, user, info) => {
+  //   if (authError) {
+  //     console.error(error);
+  //     return next(authError);
+  //   }
+  //   if (!user) {
+  //     return res.json({
+  //       code: 404,
+  //       message: "존재하지 않는 회원입니다.",
+  //     });
+  //   }
+  //   return req.login(user, (signInError) => {
+  //     if (signInError) {
+  //       console.error(signInError);
+  //       return next(signInError);
+  //     }
+  //     return res.json({
+  //       code: 200,
+  //       message: "로그인 성공",
+  //     });
+  //   });
+  // })(req, res, next);
 };
 
 exports.logout = (req, res) => {
-  req.logout(() => {
-    res.json({
-      code: 200,
-      message: "로그아웃 성공",
-    });
-  });
+  // req.logout(() => {
+  //   res.json({
+  //     code: 200,
+  //     message: "로그아웃 성공",
+  //   });
+  // });
 };
