@@ -5,7 +5,6 @@ const morgan = require("morgan");
 const session = require("express-session");
 const dotenv = require("dotenv");
 const schedule = require("node-schedule");
-const passport = require("passport");
 
 dotenv.config();
 
@@ -13,12 +12,10 @@ dotenv.config();
 
 // NOTE DB 설정, Passport 설정
 const { sequelize } = require("./models");
-const passportConfig = require("./passport");
 const { getNewEventData, getInitialData } = require("./utils/getEventData");
 const v1 = require("./routes/v1");
 const auth = require("./routes/auth");
 const app = express();
-passportConfig();
 app.set("port", process.env.PORT || 3030);
 
 const rule = new schedule.RecurrenceRule();
@@ -62,9 +59,6 @@ app.use(
     },
   })
 );
-
-app.use(passport.initialize());
-app.use(passport.session());
 
 app.use("/v1", v1);
 app.use("/auth", auth);
