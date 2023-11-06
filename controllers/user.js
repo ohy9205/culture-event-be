@@ -6,7 +6,6 @@ exports.getUserMe = async (req, res) => {
   const token = req.header("Authorization").split(" ")[1];
 
   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-    console.log("user err", err.message);
     if (err) {
       res.status(401).json({ code: 401, message: "토큰 에러" });
     } else {

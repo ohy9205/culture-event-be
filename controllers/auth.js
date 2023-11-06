@@ -93,7 +93,7 @@ exports.verifyRefreshToken = (req, res, next) => {
     if (err) {
       if (err.name === "TokenExpiredError") {
         res
-          .status(401)
+          .status(403)
           .json({ code: 401, message: "Refresh Token이 만료되었습니다" });
       } else {
         res

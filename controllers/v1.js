@@ -21,7 +21,6 @@ exports.getEvents = async (req, res) => {
     let where = {};
     let orderOption = [];
 
-    console.log("req.query.orderBy", req.query.orderBy);
     if (req.query.orderBy === "views") {
       orderOption = [["views", "DESC"]];
     } else if (req.query.orderBy === "latest") {
@@ -67,7 +66,6 @@ exports.getEvents = async (req, res) => {
     let where = {};
     let orderOption = [];
 
-    console.log("req.query.orderBy", req.query.orderBy);
     if (req.query.orderBy === "views") {
       orderOption = [["views", "DESC"]];
     } else if (req.query.orderBy === "latest") {

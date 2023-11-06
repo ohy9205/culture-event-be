@@ -21,7 +21,7 @@ app.set("port", process.env.PORT || 3030);
 
 const rule = new schedule.RecurrenceRule();
 
-rule.hour = 14;
+rule.hour = 9;
 rule.minute = 30;
 rule.tz = "Asia/Seoul";
 
@@ -67,6 +67,7 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  console.log("err middleware", err);
   res.locals.message = err.message;
   res.locals.error = process.env.NODE_ENV !== "production" ? err : {};
   res.status(err.status || 500);
