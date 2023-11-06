@@ -21,8 +21,8 @@ app.set("port", process.env.PORT || 3030);
 
 const rule = new schedule.RecurrenceRule();
 
-rule.hour = 13;
-rule.minute = 5;
+rule.hour = 14;
+rule.minute = 30;
 rule.tz = "Asia/Seoul";
 
 schedule.scheduleJob(rule, function () {
