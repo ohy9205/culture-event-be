@@ -31,7 +31,7 @@ exports.signUp = async (req, res, next) => {
 exports.signIn = async (req, res, next) => {
   const { email, password } = req.body;
   try {
-    const exUser = await User.findOne({ where: email });
+    const exUser = await User.findOne({ where: { email } });
     if (!exUser) {
       return res.json({
         code: 404,

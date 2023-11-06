@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 
 exports.verifyAccessToken = (req, res, next) => {
   const token = req.header("Authorization");
+  console.log("token", token);
   if (!token) {
     res.status(401).json({ code: 401, message: "Access Token이 없습니다." });
   }
