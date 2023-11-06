@@ -17,20 +17,26 @@ exports.getEvents = async (req, res) => {
     }
     const { category, location, isfree, keyword, start, end, latest } =
       req.query;
-    const orderOption =
-      req.query.orderBy === "views"
-        ? [["views", "DESC"]]
-        : [["startDate", "ASC"]];
 
     let where = {};
+    let orderOption = [];
+
+    console.log("req.query.orderBy", req.query.orderBy);
+    if (req.query.orderBy === "views") {
+      orderOption = [["views", "DESC"]];
+    } else if (req.query.orderBy === "latest") {
+      console.log("hello");
+      where.startDate = { [Op.gte]: currentDate() };
+      orderOption = [["startDate", "ASC"]];
+    } else {
+      orderOption = [["startDate", "ASC"]];
+    }
     if (category) where.category = category;
     if (location) where.location = location;
     if (isfree) where.isFree = isfree === "무료";
     if (keyword) where.title = { [Op.like]: `%${keyword}%` };
     if (start && end) {
       where.startDate = { [Op.gte]: start, [Op.lte]: end };
-    } else if (latest === "today") {
-      where.startDate = { [Op.gte]: currentDate() };
     }
 
     await Event.findAndCountAll({
@@ -57,21 +63,28 @@ exports.getEvents = async (req, res) => {
     // 페이지네이션 사용 X
     const { category, location, isfree, keyword, start, end, latest } =
       req.query;
-    const orderOption =
-      req.query.orderBy === "views"
-        ? [["views", "DESC"]]
-        : [["startDate", "ASC"]];
 
     let where = {};
+    let orderOption = [];
+
+    console.log("req.query.orderBy", req.query.orderBy);
+    if (req.query.orderBy === "views") {
+      orderOption = [["views", "DESC"]];
+    } else if (req.query.orderBy === "latest") {
+      console.log("hello");
+      where.startDate = { [Op.gte]: currentDate() };
+      orderOption = [["startDate", "ASC"]];
+    } else {
+      orderOption = [["startDate", "ASC"]];
+    }
     if (category) where.category = category;
     if (location) where.location = location;
     if (isfree) where.isFree = isfree === "무료";
     if (keyword) where.title = { [Op.like]: `%${keyword}%` };
     if (start && end) {
       where.startDate = { [Op.gte]: start, [Op.lte]: end };
-    } else if (latest === "today") {
-      where.startDate = { [Op.gte]: currentDate() };
     }
+
     await Event.findAll({
       order: orderOption,
       where,

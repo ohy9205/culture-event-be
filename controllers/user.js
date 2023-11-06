@@ -3,11 +3,12 @@ const jwt = require("jsonwebtoken");
 exports.getUserMe = async (req, res) => {
   // 토큰으로 사용자 정보 확인하기
   // at 검증 이후 로직임.
-  const token = req.header("Authorization");
+  const token = req.header("Authorization").split(" ")[1];
 
   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
+    console.log("user err", err.message);
     if (err) {
-      res.stats(401).json({ code: 401, message: "토큰 에러" });
+      res.status(401).json({ code: 401, message: "토큰 에러" });
     } else {
       const userEmail = decoded.email;
 
