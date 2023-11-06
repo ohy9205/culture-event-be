@@ -4,6 +4,8 @@ const {
   getEventsById,
   increaseViewCount,
 } = require("../controllers/v1");
+
+const { verifyAccessToken } = require("../middlewares");
 const cors = require("cors");
 
 const router = express.Router();
@@ -13,8 +15,8 @@ router.use(
   })
 );
 
-router.get("/events", getEvents);
+router.get("/events", verifyAccessToken, getEvents);
 
-router.get("/events/:id", getEventsById, increaseViewCount);
+router.get("/events/:id", verifyAccessToken, getEventsById, increaseViewCount);
 
 module.exports = router;
