@@ -9,8 +9,8 @@ const { verifyAccessToken } = require("../middlewares");
 
 const router = express.Router();
 
-router.get("/events", verifyAccessToken, getEvents);
+router.get("/events", getEvents);
 
-router.get("/events/:id", verifyAccessToken, getEventsById, increaseViewCount);
+router.get("/events/:id", getEventsById, increaseViewCount);
 
 module.exports = router;
