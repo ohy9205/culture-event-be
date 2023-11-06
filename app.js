@@ -5,6 +5,7 @@ const morgan = require("morgan");
 const session = require("express-session");
 const dotenv = require("dotenv");
 const schedule = require("node-schedule");
+const cors = require("cors");
 
 dotenv.config();
 
@@ -57,6 +58,11 @@ app.use(
       httpOnly: true,
       secure: false,
     },
+  })
+);
+app.use(
+  cors({
+    credentials: true,
   })
 );
 
