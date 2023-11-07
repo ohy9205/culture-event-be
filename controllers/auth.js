@@ -74,8 +74,7 @@ exports.signIn = async (req, res, next) => {
           .cookie("rt", refreshToken, {
             // path: "/",
             httpOnly: true,
-            secure: true,
-            sameSite: "None",
+            secure: false,
           })
           .json({
             code: 200,
