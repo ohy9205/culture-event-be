@@ -15,6 +15,7 @@ exports.verifyAccessToken = (req, res, next) => {
           .status(401)
           .json({ code: 403, message: "Access Token이 만료되었습니다" });
       } else {
+        console.log("err.message", err.message);
         res
           .status(401)
           .json({ code: 401, message: "토큰 검증에 실패했습니다." });

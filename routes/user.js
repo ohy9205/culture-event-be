@@ -4,6 +4,6 @@ const { getUserMe } = require("../controllers/user");
 
 const router = express.Router();
 
-router.get("/me", verifyAccessToken, getUserMe);
+router.get("/me", getUserMe);
 
 module.exports = router;
