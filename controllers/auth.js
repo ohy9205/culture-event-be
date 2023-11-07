@@ -70,12 +70,17 @@ exports.signIn = async (req, res, next) => {
             issuer: "mk",
           }
         );
-        res.json({
-          code: 200,
-          message: "로그인 성공, 토큰 발급",
-          at: token,
-          rt: refreshToken,
-        });
+        res
+          .cookie("rt", refreshToken, {
+            // path: "/",
+            httpOnly: true,
+            secure: false,
+          })
+          .json({
+            code: 200,
+            message: "로그인 성공, 토큰 발급",
+            at: token,
+          });
       }
     }
   } catch (error) {
@@ -84,10 +89,11 @@ exports.signIn = async (req, res, next) => {
 };
 
 exports.verifyRefreshToken = (req, res, next) => {
-  const token = req.header("Authorization");
+  const token = req.header("Authorization").split(" ")[1];
   if (!token) {
     res.status(401).json({ code: 401, message: "Refresh Token이 없습니다" });
   }
+  console.log("Rtoken", token);
 
   jwt.verify(token, process.env.RT_SECRET, (err, decoded) => {
     if (err) {
@@ -96,6 +102,7 @@ exports.verifyRefreshToken = (req, res, next) => {
           .status(403)
           .json({ code: 401, message: "Refresh Token이 만료되었습니다" });
       } else {
+        console.log("error.message", err.message);
         res
           .status(401)
           .json({ code: 401, message: "토큰 검증에 실패했습니다." });
@@ -104,8 +111,8 @@ exports.verifyRefreshToken = (req, res, next) => {
       const expirationDate = new Date(decoded.exp * 1000);
       const currentDate = new Date();
       const timeDiff = expirationDate - currentDate;
-
       const daysUntilExpiration = timeDiff / (1000 * 60 * 60 * 24);
+
       const exUserId = decoded.id;
       const exUserEmail = decoded.email;
 
