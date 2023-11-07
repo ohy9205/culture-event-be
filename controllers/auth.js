@@ -75,7 +75,6 @@ exports.signIn = async (req, res, next) => {
             // path: "/",
             httpOnly: true,
             secure: false,
-            sameSite: "None",
           })
           .json({
             code: 200,
