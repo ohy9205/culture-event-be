@@ -79,6 +79,7 @@ exports.getUserMe = async (req, res) => {
                     res
                       .cookie("rt", newRefreshToken, {
                         httpOnly: true,
+                        secure: false,
                       })
                       .json({
                         code: 200,
