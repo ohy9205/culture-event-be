@@ -76,7 +76,6 @@ exports.getUserMe = async (req, res) => {
                   attributes: ["email", "nick"],
                 })
                   .then((user) => {
-                    console.log("set cookie, json 데이터 보내기");
                     res
                       .cookie("rt", newRefreshToken, {
                         httpOnly: true,
