@@ -1,8 +1,1 @@
 # seoul-event-info-server
-
-
-MYSQLPASSWORD d1bceFgGfcCb6EDDgC-DgFHfA12-2EG3
-
-
-MYSQLHOST
-MYSQLPORT
