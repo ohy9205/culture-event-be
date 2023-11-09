@@ -81,15 +81,22 @@ exports.getNewEventData = async () => {
   console.log("new data");
   await destroyData();
   console.log("destroy data finished");
+  const today = currentDate();
+  console.log("today =>", today);
 
   const response = await axios.get(
     `http://openapi.seoul.go.kr:8088/${process.env.API_KEY}/json/culturalEventInfo/1/1000`
   );
   const eventData = response.data.culturalEventInfo.row;
 
-  const newEvent = eventData.filter(
-    (data) => data.RGSTDATE.split(" ")[0] === currentDate()
-  );
+  const newEvent = eventData.filter((data) => {
+    if (data.RGSTDATE.split(" ")[0] === "2023-11-08") {
+      console.log("등록일", data.RGSTDATE.split(" ")[0]);
+      console.log("오늘날짜", today);
+    }
+
+    return data.RGSTDATE.split(" ")[0] === today;
+  });
   newEvent.map(async (event) => {
     Event.create({
       category: event.CODENAME,
