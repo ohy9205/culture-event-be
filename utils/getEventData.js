@@ -90,7 +90,7 @@ exports.getNewEventData = async () => {
   const eventData = response.data.culturalEventInfo.row;
 
   const newEvent = eventData.filter((data) => {
-    if (data.RGSTDATE.split(" ")[0] === "2023-11-08") {
+    if (data.RGSTDATE.split(" ")[0] === today) {
       console.log("등록일", data.RGSTDATE.split(" ")[0]);
       console.log("오늘날짜", today);
     }
