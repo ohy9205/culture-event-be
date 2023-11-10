@@ -21,7 +21,7 @@ app.set("port", process.env.PORT || 3030);
 
 const rule = new schedule.RecurrenceRule();
 
-rule.hour = 9;
+rule.hour = 23;
 rule.minute = 30;
 rule.tz = "Asia/Seoul";
 
