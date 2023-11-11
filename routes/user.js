@@ -1,9 +1,9 @@
 const express = require("express");
-const { verifyAccessToken } = require("../middlewares");
 const { getUserMe } = require("../controllers/user");
+const { verfiyLoginUser } = require("../middlewares");
 
 const router = express.Router();
 
-router.get("/me", getUserMe);
+router.get("/me", verfiyLoginUser, getUserMe);
 
 module.exports = router;
