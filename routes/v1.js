@@ -13,4 +13,6 @@ router.get("/events", getEvents);
 
 router.get("/events/:id", getEventsById, increaseViewCount);
 
+// router.get("/events/:id/comment")
+
 module.exports = router;

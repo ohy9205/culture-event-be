@@ -1,5 +1,5 @@
 const express = require("express");
-const { getUserMe } = require("../controllers/user");
+const { getUserMe, getUserComments } = require("../controllers/user");
 const { verfiyLoginUser } = require("../middlewares");
 
 const router = express.Router();
@@ -8,6 +8,6 @@ const router = express.Router();
 router.get("/me", verfiyLoginUser, getUserMe);
 
 // 유저가 작성한 댓글 가져오기
-router.get("/:id/comments");
+router.get("/comments", verfiyLoginUser, getUserComments);
 
 module.exports = router;
