@@ -4,10 +4,6 @@ class Comment extends Sequelize.Model {
   static initiate(sequelize) {
     Comment.init(
       {
-        writer: {
-          type: Sequelize.INTEGER,
-          allowNull: false,
-        },
         content: {
           type: Sequelize.TEXT,
           allowNull: false,
@@ -24,7 +20,10 @@ class Comment extends Sequelize.Model {
       }
     );
   }
-  static associate(db) {}
+  static associate(db) {
+    db.Comment.belongsTo(db.User, { foreignKey: "commenter", targetKey: "id" });
+    db.Comment.belongsTo(db.Event, { foreignKey: "eventId", targetKey: "id" });
+  }
 }
 
 module.exports = Comment;

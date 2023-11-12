@@ -132,7 +132,7 @@ exports.verfiyLoginUser = (req, res, next) => {
         .then((user) => {
           res.locals.user = {
             code: 200,
-            info: user,
+            user,
           };
           next();
         })

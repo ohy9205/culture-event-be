@@ -16,6 +16,7 @@ const { getNewEventData, getInitialData } = require("./utils/getEventData");
 const v1 = require("./routes/v1");
 const auth = require("./routes/auth");
 const user = require("./routes/user");
+const comment = require("./routes/comment");
 const app = express();
 app.set("port", process.env.PORT || 3030);
 
@@ -60,6 +61,7 @@ app.use(
 app.use("/v1", v1);
 app.use("/auth", auth);
 app.use("/user", user);
+app.use("/comment", comment);
 
 app.use((req, res, next) => {
   const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`);
