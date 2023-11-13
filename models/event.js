@@ -95,6 +95,10 @@ class Event extends Sequelize.Model {
   }
   static assocaite(db) {
     db.Event.hasMany(db.Comment, { foreignKey: "eventId", sourceKey: "id" });
+    db.Event.belongsTo(db.User, {
+      foreignKey: "favoriteUser",
+      sourceKey: "id",
+    });
   }
 }
 
