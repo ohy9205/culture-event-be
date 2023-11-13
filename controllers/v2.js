@@ -16,15 +16,15 @@ exports.getEvents = async (req, res) => {
     if (pageIndex > 1) {
       offset = pageSize * (pageIndex - 1);
     }
-    const { category, location, isfree, keyword, start, end, latest } =
+    const { category, location, isfree, keyword, start, end, orderBy } =
       req.query;
 
     let where = {};
     let orderOption = [];
 
-    if (req.query.orderBy === "views") {
+    if (orderBy === "views") {
       orderOption = [["views", "DESC"]];
-    } else if (req.query.orderBy === "latest") {
+    } else if (orderBy === "latest") {
       where.startDate = { [Op.gte]: currentDate() };
       orderOption = [["startDate", "ASC"]];
     } else {
@@ -66,9 +66,9 @@ exports.getEvents = async (req, res) => {
     let where = {};
     let orderOption = [];
 
-    if (req.query.orderBy === "views") {
+    if (orderBy === "views") {
       orderOption = [["views", "DESC"]];
-    } else if (req.query.orderBy === "latest") {
+    } else if (orderBy === "latest") {
       where.startDate = { [Op.gte]: currentDate() };
       orderOption = [["startDate", "ASC"]];
     } else {
@@ -140,23 +140,4 @@ exports.increaseViewCount = async (req, res, next) => {
     console.error(error);
     next(err);
   }
-};
-
-exports.getEventsByViews = async (req, res) => {
-  await Event.findAll({
-    order: ["views", "DESC"],
-  })
-    .then((events) => {
-      res.json({
-        code: 200,
-        payload: events,
-      });
-    })
-    .catch((err) => {
-      console.error(err);
-      return res.status(500).json({
-        code: 500,
-        message: "서버 에러?",
-      });
-    });
 };

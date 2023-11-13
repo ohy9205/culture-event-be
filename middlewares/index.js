@@ -84,7 +84,7 @@ exports.verfiyLoginUser = (req, res, next) => {
                     };
                     res.cookie("rt", newRefreshToken, {
                       httpOnly: true,
-                      secure: false,
+                      secure: true,
                     });
                     next();
                   })
@@ -125,7 +125,6 @@ exports.verfiyLoginUser = (req, res, next) => {
       }
     } else {
       // at 유효, rt 검증
-
       jwt.verify(refreshToken, process.env.RT_SECRET, async (err, decoded) => {
         const expirationDate = new Date(decoded.exp * 1000);
         const currentDate = new Date();
@@ -161,7 +160,7 @@ exports.verfiyLoginUser = (req, res, next) => {
                 };
                 res.cookie("rt", newRefreshToken, {
                   httpOnly: true,
-                  secure: false,
+                  secure: true,
                 });
                 next();
               })
@@ -210,7 +209,7 @@ exports.verfiyLoginUser = (req, res, next) => {
                 };
                 res.cookie("rt", newRefreshToken, {
                   httpOnly: true,
-                  secure: false,
+                  secure: true,
                 });
                 next();
               })
@@ -231,7 +230,6 @@ exports.verfiyLoginUser = (req, res, next) => {
                 res.locals.user = {
                   code: 200,
                   user,
-                  at: newAccessToken,
                 };
                 next();
               })

@@ -3,14 +3,14 @@ const {
   getEvents,
   getEventsById,
   increaseViewCount,
-} = require("../controllers/v1");
+} = require("../controllers/v2");
 
-const { verifyAccessToken } = require("../middlewares");
+const { verfiyLoginUser } = require("../middlewares");
 
 const router = express.Router();
 
-router.get("/events", verifyAccessToken, getEvents);
+router.get("/events", verfiyLoginUser, getEvents);
 
-router.get("/events/:id", verifyAccessToken, getEventsById, increaseViewCount);
+router.get("/events/:id", verfiyLoginUser, getEventsById, increaseViewCount);
 
 module.exports = router;

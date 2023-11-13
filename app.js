@@ -14,6 +14,7 @@ dotenv.config();
 const { sequelize } = require("./models");
 const { getNewEventData, getInitialData } = require("./utils/getEventData");
 const v1 = require("./routes/v1");
+const v2 = require("./routes/v2");
 const auth = require("./routes/auth");
 const user = require("./routes/user");
 const comment = require("./routes/comment");
@@ -59,6 +60,7 @@ app.use(
 );
 
 app.use("/v1", v1);
+app.use("/v2", v2);
 app.use("/auth", auth);
 app.use("/user", user);
 app.use("/comment", comment);
