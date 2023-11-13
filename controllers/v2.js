@@ -141,3 +141,5 @@ exports.increaseViewCount = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.toggleLikeState = async (req, res) => {};

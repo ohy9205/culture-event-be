@@ -13,4 +13,7 @@ router.get("/events", verfiyLoginUser, getEvents);
 
 router.get("/events/:id", verfiyLoginUser, getEventsById, increaseViewCount);
 
+// 좋아요 기능을 위한 라우트 필요
+router.post("/events/:id/likes", verfiyLoginUser);
+
 module.exports = router;
