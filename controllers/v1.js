@@ -68,6 +68,10 @@ exports.getEventById = async (req, res) => {
         message: "해당 id의 이벤트가 없습니다",
       });
     }
+    return res.json({
+      code: 200,
+      payload: event,
+    });
   } catch (err) {
     console.error(err);
   }
