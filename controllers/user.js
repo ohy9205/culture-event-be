@@ -1,146 +1,42 @@
+const Comment = require("../models/comment");
 const User = require("../models/user");
-const jwt = require("jsonwebtoken");
+
 exports.getUserMe = async (req, res) => {
-  // 토큰으로 사용자 정보 확인하기
-  // at 검증 이후 로직임.
-  const token = req.header("Authorization").split(" ")[1];
-  const refreshToken = req.cookies.rt;
+  // 미들웨어에서 로그인한 사용자인것을 판별하고 있음.
+  // 여기는 그 다음 단계로 미들웨어에서 전달받은 데이터를 사용해서 클라이언트에게 반환하면 됨
 
-  if (!refreshToken)
-    return res.json({
-      code: 404,
-      message: "Refresh Token이 없습니다. 잘못된 접근입니다.",
-    });
+  // user -> code, user, at?
+  console.log("getUserMe로 넘어옴");
+  const { code, user, at } = res.locals.user;
 
-  if (!token)
-    return res.json({ code: 404, message: "Access Token이 없습니다." });
-
-  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-    if (err) {
-      if (err.name === "TokenExpiredError") {
-        jwt.verify(
-          refreshToken,
-          process.env.RT_SECRET,
-          async (err, decoded) => {
-            if (err) {
-              if (err.name === "TokenExpiredError") {
-                return res.json({
-                  code: 404,
-                  message:
-                    "토큰이 모두 만료되었습니다. 다시 로그인하시기 바랍니다.",
-                });
-              } else {
-                return res.json({
-                  code: 404,
-                  message:
-                    "토큰이 유효하지 않습니다. 다시 로그인하시기 바랍니다.",
-                });
-              }
-            } else {
-              const expirationDate = new Date(decoded.exp * 1000);
-              const currentDate = new Date();
-              const timeDiff = expirationDate - currentDate;
-              const daysUntilExpiration = timeDiff / (1000 * 60 * 60 * 24);
-
-              const exUserId = decoded.id;
-              const exUserEmail = decoded.email;
-
-              const newAccessToken = jwt.sign(
-                {
-                  id: exUserId,
-                  email: exUserEmail,
-                },
-                process.env.JWT_SECRET,
-                {
-                  expiresIn: "1m",
-                  issuer: "mk",
-                }
-              );
-
-              if (daysUntilExpiration < 7) {
-                const newRefreshToken = jwt.sign(
-                  {
-                    id: exUserId,
-                    email: exUserEmail,
-                  },
-                  process.env.RT_SECRET,
-                  {
-                    expiresIn: "15d",
-                    issuer: "mk",
-                  }
-                );
-
-                const userEmail = decoded.email;
-                await User.findOne({
-                  where: { email: userEmail },
-                  attributes: ["email", "nick"],
-                })
-                  .then((user) => {
-                    res
-                      .cookie("rt", newRefreshToken, {
-                        httpOnly: true,
-                        secure: false,
-                      })
-                      .json({
-                        code: 200,
-                        payload: user,
-                        at: newAccessToken,
-                      });
-                  })
-                  .catch((err) => {
-                    console.error(err);
-                    return res.status(500).json({
-                      code: 500,
-                      message: "서버 에러?",
-                    });
-                  });
-              } else {
-                const userEmail = decoded.email;
-                await User.findOne({
-                  where: { email: userEmail },
-                  attributes: ["email", "nick"],
-                })
-                  .then((user) => {
-                    console.log("json 데이터 보내기");
-                    res.json({
-                      code: 200,
-                      payload: user,
-                      at: newAccessToken,
-                    });
-                  })
-                  .catch((err) => {
-                    console.error(err);
-                    return res.status(500).json({
-                      code: 500,
-                      message: "서버 에러?",
-                    });
-                  });
-              }
-            }
-          }
-        );
-      } else {
-        res.status(401).json({ code: 401, message: err.name });
-      }
-    } else {
-      const userEmail = decoded.email;
-      await User.findOne({
-        where: { email: userEmail },
-        attributes: ["email", "nick"],
-      })
-        .then((user) => {
-          res.json({
-            code: 200,
-            payload: user,
-          });
-        })
-        .catch((err) => {
-          console.error(err);
-          return res.status(500).json({
-            code: 500,
-            message: "서버 에러?",
-          });
-        });
-    }
+  console.log("res.locals.at", at);
+  // at가 있을 때는 at도 같이 보내야함. at가 없으면 undefined가 되고 프론트에서 undefined로 체크하고 있음
+  return res.json({
+    code,
+    payload: user,
+    at,
   });
+};
+
+exports.getUserComments = async (req, res) => {
+  const { user, at } = res.locals.user;
+
+  try {
+    const comments = await Comment.findAll({
+      include: {
+        model: User,
+        where: { email: user.email },
+      },
+    });
+    console.log("comments", comments);
+    return res.json({
+      code: 200,
+      message: `${user.id} 유저의 댓글 조회 성공`,
+      payload: comments,
+      at,
+    });
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
 };

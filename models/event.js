@@ -93,7 +93,9 @@ class Event extends Sequelize.Model {
       }
     );
   }
-  static assocaite(db) {}
+  static assocaite(db) {
+    db.Event.hasMany(db.Comment, { foreignKey: "eventId", sourceKey: "id" });
+  }
 }
 
 module.exports = Event;

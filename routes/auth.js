@@ -8,6 +8,4 @@ router.post("/signUp", signUp);
 
 router.post("/signIn", signIn);
 
-router.get("/token/refresh", verifyRefreshToken);
-
 module.exports = router;

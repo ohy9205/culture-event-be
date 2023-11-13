@@ -1,5 +1,6 @@
 const { Event } = require("../models");
 const { Op } = require("sequelize");
+const Comment = require("../models/comment");
 
 const currentDate = () => {
   return new Date().toISOString().slice(0, 10);
@@ -105,10 +106,13 @@ exports.getEvents = async (req, res) => {
 
 exports.getEventsById = async (req, res, next) => {
   // TODO 조회수 증가하는 로직 필요
-
   try {
     const eventId = req.params.id;
-    const event = await Event.findByPk(eventId);
+    const event = await Event.findByPk(eventId, {
+      include: {
+        model: Comment,
+      },
+    });
 
     if (!event) {
       return res.status(404).json({
@@ -129,6 +133,7 @@ exports.increaseViewCount = async (req, res, next) => {
     const event = res.locals.event;
 
     event.increment("views", { by: 1 });
+
     res.json({
       code: 200,
       payload: event,
