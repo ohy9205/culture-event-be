@@ -41,7 +41,10 @@ class User extends Sequelize.Model {
   }
   static associate(db) {
     db.User.hasMany(db.Comment, { foreignKey: "commenter", sourceKey: "id" });
-    db.User.hasMany(db.Event, { foreignKey: "favoriteUser", sourceKey: "id" });
+    db.User.belongsToMany(db.Event, {
+      through: "favoriteEvent",
+      foreignKey: "userId",
+    });
   }
 }
 

@@ -19,6 +19,7 @@ exports.verfiyLoginUser = (req, res, next) => {
     if (err) {
       if (err.name === "TokenExpiredError") {
         // at 만료
+        console.log("at 만료");
         jwt.verify(
           refreshToken,
           process.env.RT_SECRET,
@@ -74,7 +75,7 @@ exports.verfiyLoginUser = (req, res, next) => {
                 const userEmail = decoded.email;
                 await User.findOne({
                   where: { email: userEmail },
-                  attributes: ["email", "nick"],
+                  attributes: ["id", "email", "nick"],
                 })
                   .then((user) => {
                     res.locals.user = {
@@ -99,7 +100,7 @@ exports.verfiyLoginUser = (req, res, next) => {
                 const userEmail = decoded.email;
                 await User.findOne({
                   where: { email: userEmail },
-                  attributes: ["email", "nick"],
+                  attributes: ["id", "email", "nick"],
                 })
                   .then((user) => {
                     res.locals.user = {
@@ -125,6 +126,7 @@ exports.verfiyLoginUser = (req, res, next) => {
       }
     } else {
       // at 유효, rt 검증
+      console.log("at 유효");
       jwt.verify(refreshToken, process.env.RT_SECRET, async (err, decoded) => {
         const expirationDate = new Date(decoded.exp * 1000);
         const currentDate = new Date();
@@ -151,7 +153,7 @@ exports.verfiyLoginUser = (req, res, next) => {
             const userEmail = decoded.email;
             await User.findOne({
               where: { email: userEmail },
-              attributes: ["email", "nick"],
+              attributes: ["id", "email", "nick"],
             })
               .then((user) => {
                 res.locals.user = {
@@ -199,7 +201,7 @@ exports.verfiyLoginUser = (req, res, next) => {
             const userEmail = decoded.email;
             await User.findOne({
               where: { email: userEmail },
-              attributes: ["email", "nick"],
+              attributes: ["id", "email", "nick"],
             })
               .then((user) => {
                 res.locals.user = {
@@ -224,7 +226,7 @@ exports.verfiyLoginUser = (req, res, next) => {
             const userEmail = decoded.email;
             await User.findOne({
               where: { email: userEmail },
-              attributes: ["email", "nick"],
+              attributes: ["id", "email", "nick"],
             })
               .then((user) => {
                 res.locals.user = {

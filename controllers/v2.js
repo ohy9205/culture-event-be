@@ -1,7 +1,7 @@
 const { Event } = require("../models");
 const { Op } = require("sequelize");
 const Comment = require("../models/comment");
-
+const { User } = require("../models");
 const currentDate = () => {
   return new Date().toISOString().slice(0, 10);
 };
@@ -21,6 +21,8 @@ exports.getEvents = async (req, res) => {
 
     let where = {};
     let orderOption = [];
+
+    console.log("orderBy", orderBy);
 
     if (orderBy === "views") {
       orderOption = [["views", "DESC"]];
@@ -60,7 +62,7 @@ exports.getEvents = async (req, res) => {
       });
   } else {
     // 페이지네이션 사용 X
-    const { category, location, isfree, keyword, start, end, latest } =
+    const { category, location, isfree, keyword, start, end, orderBy } =
       req.query;
 
     let where = {};
@@ -142,4 +144,40 @@ exports.increaseViewCount = async (req, res, next) => {
   }
 };
 
-exports.toggleLikeState = async (req, res) => {};
+exports.toggleLikeState = async (req, res, next) => {
+  // NOTE 필요한것 유저 정보, 이벤트 아이디
+  const { user } = res.locals.user;
+  const userId = user.id;
+  const eventId = Number(req.params.id);
+
+  try {
+    const userInfo = await User.findOne({
+      where: { id: userId },
+      include: [{ model: Event, through: "favoriteEvent" }],
+    });
+    const likedList = userInfo.Events;
+    const isLiked = likedList.some((event) => {
+      return event.id === eventId;
+    });
+    console.log("isLiked", isLiked);
+
+    if (isLiked) {
+      await userInfo.removeEvents(eventId);
+      return res.json({
+        code: 200,
+        message: `이벤트 ${eventId}를 좋아요에서 삭제했습니다.`,
+      });
+    } else {
+      // 좋아하는 이벤트가 아닌 경우, 추가
+      await userInfo.addEvents(eventId);
+      console.log(`이벤트 ${eventId}를 좋아요에 추가했습니다.`);
+      return res.json({
+        code: 200,
+        message: `이벤트 ${eventId}를 좋아요에서 추가했습니다.`,
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+};
