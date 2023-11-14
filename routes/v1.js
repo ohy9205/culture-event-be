@@ -1,18 +1,16 @@
 const express = require("express");
 const {
-  getEvents,
-  getEventsById,
-  increaseViewCount,
+  getLatestEvent,
+  getMostPopularEvent,
+  getEventById,
 } = require("../controllers/v1");
-
-const { verifyAccessToken } = require("../middlewares");
 
 const router = express.Router();
 
-router.get("/events", getEvents);
+router.get("/events/latest", getLatestEvent);
 
-router.get("/events/:id", getEventsById, increaseViewCount);
+router.get("/events/popular", getMostPopularEvent);
 
-// router.get("/events/:id/comment")
+router.get("/events/:id", getEventById);
 
 module.exports = router;
