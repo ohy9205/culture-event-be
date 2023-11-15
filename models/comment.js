@@ -7,6 +7,7 @@ class Comment extends Sequelize.Model {
         content: {
           type: Sequelize.TEXT,
           allowNull: false,
+          defaultValue: "",
         },
       },
       {
