@@ -1,4 +1,5 @@
-const { Event } = require("../models");
+const Event = require("../models/event");
+const User = require("../models/user");
 const { Op } = require("sequelize");
 const Comment = require("../models/comment");
 
@@ -59,7 +60,17 @@ exports.getEventById = async (req, res) => {
     const event = await Event.findByPk(eventId, {
       include: {
         model: Comment,
+        include: {
+          model: User,
+        },
       },
+    });
+    console.log("event id", event.id);
+    const eventComment = event.Comments.map((comment) => {
+      return {
+        content: comment.content,
+        writer: comment.User.email,
+      };
     });
 
     if (!event) {
@@ -68,9 +79,15 @@ exports.getEventById = async (req, res) => {
         message: "해당 id의 이벤트가 없습니다",
       });
     }
+    // 이벤트 데이터와, 댓글 내용, 댓글 작성자 이메일이 같이 보내져야 함.
+    // {event, CommentList}
+
     return res.json({
       code: 200,
-      payload: event,
+      payload: {
+        event,
+        eventComment,
+      },
     });
   } catch (err) {
     console.error(err);

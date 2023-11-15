@@ -1,14 +1,10 @@
 const Comment = require("../models/comment");
+const Event = require("../models/event");
 const User = require("../models/user");
 
 exports.getUserMe = async (req, res) => {
-  // 미들웨어에서 로그인한 사용자인것을 판별하고 있음.
-  // 여기는 그 다음 단계로 미들웨어에서 전달받은 데이터를 사용해서 클라이언트에게 반환하면 됨
-
-  // user -> code, user, at?
   const { code, user, at } = res.locals.user;
 
-  // at가 있을 때는 at도 같이 보내야함. at가 없으면 undefined가 되고 프론트에서 undefined로 체크하고 있음
   return res.json({
     code,
     payload: user,
@@ -26,7 +22,6 @@ exports.getUserComments = async (req, res) => {
         where: { email: user.email },
       },
     });
-    console.log("comments", comments);
     return res.json({
       code,
       payload: comments,
@@ -35,5 +30,39 @@ exports.getUserComments = async (req, res) => {
   } catch (err) {
     console.error(err);
     next(err);
+  }
+};
+
+exports.getUserLikeEvent = async (req, res) => {
+  // 반환해야 하는 값 event의 id, title, period, thumbnail 4개를 묶어서 보내줘야 함.
+  const { user } = res.locals.user;
+  const userId = user.id;
+
+  try {
+    const userInfo = await User.findByPk(userId, {
+      include: [{ model: Event, through: "favoriteEvent" }],
+    });
+
+    const userLikeEvent = userInfo.Events;
+    console.log("user like event", userLikeEvent);
+
+    const data = userLikeEvent.map((event) => {
+      return {
+        id: event.id,
+        title: event.title,
+        period: event.eventPeriod,
+        thumbnail: event.thumbnail,
+      };
+    });
+
+    console.log("return data", data);
+
+    return res.json({
+      code: 200,
+      message: "테스트중",
+      payload: data,
+    });
+  } catch (err) {
+    console.error(err);
   }
 };

@@ -104,30 +104,6 @@ exports.getEvents = async (req, res) => {
   }
 };
 
-exports.getEventsById = async (req, res, next) => {
-  // TODO 조회수 증가하는 로직 필요
-  try {
-    const eventId = req.params.id;
-    const event = await Event.findByPk(eventId, {
-      include: {
-        model: Comment,
-      },
-    });
-
-    if (!event) {
-      return res.status(404).json({
-        code: 404,
-        message: "해당 id의 이벤트가 없습니다.",
-      });
-    }
-    res.locals.event = event;
-    next();
-  } catch (err) {
-    console.error(err);
-    next(err);
-  }
-};
-
 exports.increaseViewCount = async (req, res, next) => {
   try {
     const event = res.locals.event;
@@ -159,7 +135,6 @@ exports.toggleLikeState = async (req, res, next) => {
     const isLiked = likedList.some((event) => {
       return event.id === eventId;
     });
-    console.log("isLiked", isLiked);
 
     if (isLiked) {
       await userInfo.removeEvents(eventId);
@@ -176,6 +151,25 @@ exports.toggleLikeState = async (req, res, next) => {
         message: `이벤트 ${eventId}를 좋아요에서 추가했습니다.`,
       });
     }
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+};
+
+exports.getLikedCount = async (req, res, next) => {
+  // 이벤트 id로 조회를 하면 이벤트에 좋아요를 누른 유저를 가져온다음 유저의 갯수만 반환한다.
+  const eventId = Number(req.params.id);
+  try {
+    const event = await Event.findByPk(eventId, {
+      include: [{ model: User, through: "favoriteEvent" }],
+    });
+    const favoriteUsers = event.Users;
+    console.log(favoriteUsers.length);
+    return res.json({
+      code: 200,
+      count: favoriteUsers.length,
+    });
   } catch (err) {
     console.error(err);
     next(err);
