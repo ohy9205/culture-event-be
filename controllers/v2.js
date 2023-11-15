@@ -175,3 +175,27 @@ exports.getLikedCount = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getEventComments = async (req, res, next) => {
+  const eventId = Number(req.params.id);
+  try {
+    const comments = await Comment.findAll({
+      where: { eventId },
+      include: { model: User, attributes: ["email", "nick"] },
+    });
+
+    if(!comments) {
+      return res.status(404).json({
+        code: 404,
+        message: "조회 실패"
+      })
+    }
+    return res.status(200).json({
+      code: 200,
+      comments,
+    });
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+};

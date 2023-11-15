@@ -4,6 +4,7 @@ const {
   increaseViewCount,
   toggleLikeState,
   getLikedCount,
+  getEventComments,
 } = require("../controllers/v2");
 
 const { verfiyLoginUser } = require("../middlewares");
@@ -20,5 +21,8 @@ router.post("/events/:id/likes", verfiyLoginUser, toggleLikeState);
 
 // 좋아요 갯수를 가져오기
 router.get("/events/:id/likes", verfiyLoginUser, getLikedCount);
+
+// 댓글 가져오기
+router.get("/events/:id/comments", verfiyLoginUser, getEventComments);
 
 module.exports = router;
