@@ -57,7 +57,15 @@ exports.getMostPopularEvent = async (req, res) => {
 exports.getEventById = async (req, res) => {
   try {
     const eventId = req.params.id;
-    const event = await Event.findByPk(eventId);
+    const event = await Event.findByPk(eventId, {
+      include: {
+        model: Comment,
+        include: {
+          model: User,
+          attributes: ["email", "nick"],
+        },
+      },
+    });
 
     if (!event) {
       return res.status(404).json({
