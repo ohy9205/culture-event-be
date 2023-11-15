@@ -62,7 +62,7 @@ exports.getEventById = async (req, res) => {
         model: Comment,
         include: {
           model: User,
-          attribute: ["email", "nick"],
+          attributes: ["email", "nick"],
         },
       },
     });
