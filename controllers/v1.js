@@ -62,15 +62,9 @@ exports.getEventById = async (req, res) => {
         model: Comment,
         include: {
           model: User,
+          attribute: ["email", "nick"],
         },
       },
-    });
-    console.log("event id", event.id);
-    const eventComment = event.Comments.map((comment) => {
-      return {
-        content: comment.content,
-        writer: comment.User.email,
-      };
     });
 
     if (!event) {
@@ -79,15 +73,10 @@ exports.getEventById = async (req, res) => {
         message: "해당 id의 이벤트가 없습니다",
       });
     }
-    // 이벤트 데이터와, 댓글 내용, 댓글 작성자 이메일이 같이 보내져야 함.
-    // {event, CommentList}
 
     return res.json({
       code: 200,
-      payload: {
-        event,
-        eventComment,
-      },
+      payload: event,
     });
   } catch (err) {
     console.error(err);
