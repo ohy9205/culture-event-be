@@ -59,6 +59,7 @@ exports.updateComment = async (req, res, next) => {
     return res.status(200).json({
       code: 200,
       message: "댓글이 정상적으로 수정되었습니다.",
+      content,
     });
   } catch (err) {
     console.error(err);

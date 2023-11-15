@@ -43,8 +43,14 @@ exports.getUserLikeEvent = async (req, res) => {
       include: [{ model: Event, through: "favoriteEvent" }],
     });
 
+    if (!userInfo) {
+      return res.status(404).json({
+        code: 404,
+        message: "유저를 찾을 수 없습니다",
+      });
+    }
+
     const userLikeEvent = userInfo.Events;
-    console.log("user like event", userLikeEvent);
 
     const data = userLikeEvent.map((event) => {
       return {
@@ -55,11 +61,8 @@ exports.getUserLikeEvent = async (req, res) => {
       };
     });
 
-    console.log("return data", data);
-
     return res.json({
       code: 200,
-      message: "테스트중",
       payload: data,
     });
   } catch (err) {
