@@ -58,13 +58,20 @@ exports.getEventById = async (req, res) => {
   try {
     const eventId = req.params.id;
     const event = await Event.findByPk(eventId, {
-      include: {
-        model: Comment,
-        include: {
+      include: [
+        {
+          model: Comment,
+          include: {
+            model: User,
+            attributes: ["email", "nick"],
+          },
+        },
+        {
           model: User,
+          through: "favoriteEvent",
           attributes: ["email", "nick"],
         },
-      },
+      ],
     });
 
     if (!event) {

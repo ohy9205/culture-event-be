@@ -131,6 +131,7 @@ exports.toggleLikeState = async (req, res, next) => {
       where: { id: userId },
       include: [{ model: Event, through: "favoriteEvent" }],
     });
+    // userInfo가 없는 경우
     const likedList = userInfo.Events;
     const isLiked = likedList.some((event) => {
       return event.id === eventId;
