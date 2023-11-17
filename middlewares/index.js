@@ -86,6 +86,7 @@ exports.verfiyLoginUser = (req, res, next) => {
                     res.cookie("rt", newRefreshToken, {
                       httpOnly: true,
                       secure: true,
+                      sameSite: "none",
                     });
                     next();
                   })
@@ -163,6 +164,7 @@ exports.verfiyLoginUser = (req, res, next) => {
                 res.cookie("rt", newRefreshToken, {
                   httpOnly: true,
                   secure: true,
+                  sameSite: "none",
                 });
                 next();
               })
@@ -212,6 +214,7 @@ exports.verfiyLoginUser = (req, res, next) => {
                 res.cookie("rt", newRefreshToken, {
                   httpOnly: true,
                   secure: true,
+                  sameSite: "none",
                 });
                 next();
               })
