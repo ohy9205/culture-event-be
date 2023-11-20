@@ -23,9 +23,26 @@ exports.getUserComments = async (req, res) => {
         attributes: ["id", "email", "nick"],
       },
     });
+    const eventIds = comments.map((comment) => comment.eventId);
+
+    const commentsWithEvents = await Comment.findAll({
+      include: [
+        {
+          model: User,
+          where: { email: user.email },
+          attributes: ["id", "email", "nick"],
+        },
+        {
+          model: Event,
+          where: { id: eventIds },
+          attributes: ["title", "eventPeriod", "thumbnail"],
+        },
+      ],
+    });
+
     return res.json({
       code,
-      payload: comments,
+      payload: commentsWithEvents,
       at,
     });
   } catch (err) {
