@@ -19,9 +19,6 @@ router.get("/events/:id", verfiyLoginUser, getEventById, increaseViewCount);
 // 좋아요 기능을 위한 라우트 필요
 router.post("/events/:id/likes", verfiyLoginUser, toggleLikeState);
 
-// 좋아요 갯수를 가져오기
-router.get("/events/:id/likes", verfiyLoginUser, getLikedCount);
-
 // 댓글 가져오기
 router.get("/events/:id/comments", verfiyLoginUser, getEventComments);
 
