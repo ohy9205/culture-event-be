@@ -20,6 +20,7 @@ exports.getUserComments = async (req, res) => {
       include: {
         model: User,
         where: { email: user.email },
+        attributes: ["id", "email", "nick"],
       },
     });
     return res.json({
