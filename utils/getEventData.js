@@ -11,12 +11,13 @@ const currentDate = () => {
 
 exports.getInitialData = async () => {
   Event.count()
-    .then((count) => {
+    .then(async (count) => {
       if (count === 0) {
         console.log("테이블에 데이터가 없습니다. 초기화를 실행합니다");
         this.getEventData();
       } else {
         console.log(`테이블에 ${count}개의 데이터가 있습니다.`);
+        await destroyData();
       }
     })
     .catch((err) => {
@@ -78,7 +79,6 @@ const destroyData = async () => {
 };
 
 exports.getNewEventData = async () => {
-  console.log("new data");
   await destroyData();
   console.log("destroy data finished");
   const today = currentDate();

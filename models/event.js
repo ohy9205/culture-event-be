@@ -102,6 +102,22 @@ class Event extends Sequelize.Model {
     db.Event.belongsToMany(db.User, {
       through: "favoriteEvent",
       foreignKey: "eventId",
+      onDelete: "CASCADE",
+    });
+  }
+  static beforeBulkDestroy(options) {
+    options.individualHooks = true; // 이 부분이 중요합니다.
+
+    // 모든 삭제 작업이 시작되기 전에 호출
+  }
+
+  static beforeDestroy(event, options) {
+    event.getComments().forEach(async (comment) => {
+      await comment.destroy();
+    });
+
+    event.getUsers().forEach(async (user) => {
+      await user.destroy();
     });
   }
 }
