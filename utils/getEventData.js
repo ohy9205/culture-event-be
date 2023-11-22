@@ -63,7 +63,7 @@ const destroyData = async () => {
   await Event.findAll({
     where: {
       endDate: {
-        [Op.lt]: currentDate(),
+        [Op.lte]: currentDate(),
       },
     },
   }).then((expiredEvent) => {
