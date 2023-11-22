@@ -33,9 +33,30 @@ exports.getLatestEvent = async (req, res) => {
     });
 };
 
-exports.getMostPopularEvent = async (req, res) => {
+exports.getMostViewsEvent = async (req, res) => {
   await Event.findAndCountAll({
     order: [["views", "DESC"]],
+    limit: 7,
+    offset: 0,
+  })
+    .then((events) => {
+      res.json({
+        code: 200,
+        payload: events,
+      });
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).json({
+        code: 500,
+        message: "서버 에러?",
+      });
+    });
+};
+
+exports.getMostLikesEvent = async (req, res) => {
+  await Event.findAndCountAll({
+    order: [["likes", "DESC"]],
     limit: 7,
     offset: 0,
   })

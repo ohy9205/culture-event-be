@@ -1,5 +1,5 @@
 const { Event } = require("../models");
-const { Op } = require("sequelize");
+const { Op, or } = require("sequelize");
 const Comment = require("../models/comment");
 const { User } = require("../models");
 const currentDate = () => {
@@ -22,13 +22,13 @@ exports.getEvents = async (req, res) => {
     let where = {};
     let orderOption = [];
 
-    console.log("orderBy", orderBy);
-
     if (orderBy === "views") {
       orderOption = [["views", "DESC"]];
     } else if (orderBy === "latest") {
       where.startDate = { [Op.gte]: currentDate() };
       orderOption = [["startDate", "ASC"]];
+    } else if (orderBy === "likes") {
+      orderOption = [["likes", "DESC"]];
     } else {
       orderOption = [["startDate", "ASC"]];
     }
@@ -73,6 +73,8 @@ exports.getEvents = async (req, res) => {
     } else if (orderBy === "latest") {
       where.startDate = { [Op.gte]: currentDate() };
       orderOption = [["startDate", "ASC"]];
+    } else if (orderBy === "likes") {
+      orderOption = [["likes", "DESC"]];
     } else {
       orderOption = [["startDate", "ASC"]];
     }
@@ -127,11 +129,15 @@ exports.toggleLikeState = async (req, res, next) => {
   const userId = user.id;
   const eventId = Number(req.params.id);
 
+  // 이벤트 아이디로 popular 카운트를 증가시켜야 할듯,...
+
   try {
     const userInfo = await User.findOne({
       where: { id: userId },
       include: [{ model: Event, through: "favoriteEvent" }],
     });
+
+    const eventInfo = await Event.findByPk(eventId);
     // userInfo가 없는 경우
     const likedList = userInfo.Events;
     const isLiked = likedList.some((event) => {
@@ -140,6 +146,7 @@ exports.toggleLikeState = async (req, res, next) => {
 
     if (isLiked) {
       await userInfo.removeEvents(eventId);
+      await eventInfo.decrement("likes", { by: 1 });
       return res.json({
         code: 200,
         message: `이벤트 ${eventId}를 좋아요에서 삭제했습니다.`,
@@ -147,6 +154,7 @@ exports.toggleLikeState = async (req, res, next) => {
     } else {
       // 좋아하는 이벤트가 아닌 경우, 추가
       await userInfo.addEvents(eventId);
+      await eventInfo.increment("likes", { by: 1 });
       console.log(`이벤트 ${eventId}를 좋아요에 추가했습니다.`);
       return res.json({
         code: 200,
