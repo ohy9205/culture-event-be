@@ -159,3 +159,37 @@ exports.toggleLikeState = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getEventById = async (req, res, next) => {
+  try {
+    const eventId = req.params.id;
+    const event = await Event.findByPk(eventId, {
+      include: [
+        {
+          model: Comment,
+          include: {
+            model: User,
+            attributes: ["email", "nick"],
+          },
+        },
+        {
+          model: User,
+          through: "favoriteEvent",
+          attributes: ["email", "nick"],
+        },
+      ],
+    });
+
+    if (!event) {
+      return res.status(404).json({
+        code: 404,
+        message: "해당 id의 이벤트가 없습니다",
+      });
+    }
+
+    res.locals.event = event;
+    next();
+  } catch (err) {
+    console.error(err);
+  }
+};

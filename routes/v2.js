@@ -3,10 +3,10 @@ const {
   getEvents,
   increaseViewCount,
   toggleLikeState,
+  getEventById,
 } = require("../controllers/v2");
 
 const { verfiyLoginUser } = require("../middlewares");
-const { getEventById } = require("../controllers/v1");
 
 const router = express.Router();
 
