@@ -56,7 +56,10 @@ exports.getMostViewsEvent = async (req, res) => {
 
 exports.getMostLikesEvent = async (req, res) => {
   await Event.findAndCountAll({
-    order: [["likes", "DESC"]],
+    order: [
+      ["likes", "DESC"],
+      ["views", "DESC"],
+    ],
     limit: 7,
     offset: 0,
   })
