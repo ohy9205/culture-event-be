@@ -28,7 +28,10 @@ exports.getEvents = async (req, res) => {
       where.startDate = { [Op.gte]: currentDate() };
       orderOption = [["startDate", "ASC"]];
     } else if (orderBy === "likes") {
-      orderOption = [["likes", "DESC"]];
+      orderOption = [
+        ["likes", "DESC"],
+        ["views", "DESC"],
+      ];
     } else {
       orderOption = [["startDate", "ASC"]];
     }
