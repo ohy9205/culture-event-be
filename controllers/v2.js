@@ -105,7 +105,6 @@ exports.getEvents = async (req, res) => {
 };
 
 exports.increaseViewCount = async (req, res, next) => {
-  console.log("res.locals.event", res.locals.event);
   try {
     const event = res.locals.event;
 
