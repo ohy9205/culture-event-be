@@ -80,6 +80,10 @@ class Event extends Sequelize.Model {
           type: Sequelize.INTEGER,
           defaultValue: 0,
         },
+        likes: {
+          type: Sequelize.INTEGER,
+          defaultValue: 0,
+        },
       },
       {
         sequelize,
