@@ -60,7 +60,7 @@ exports.getMostLikesEvent = async (req, res) => {
       ["likes", "DESC"],
       ["views", "DESC"],
     ],
-    limit: 7,
+    limit: 10,
     offset: 0,
   })
     .then((events) => {
