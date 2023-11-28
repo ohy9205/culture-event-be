@@ -26,14 +26,22 @@ exports.getEvents = async (req, res) => {
       orderOption = [["views", "DESC"]];
     } else if (orderBy === "latest") {
       where.startDate = { [Op.gte]: currentDate() };
-      orderOption = [["startDate", "ASC"]];
+      orderOption = [
+        ["startDate", "ASC"],
+        ["endDate", "ASC"],
+        ["title", "ASC"],
+      ];
     } else if (orderBy === "likes") {
       orderOption = [
         ["likes", "DESC"],
         ["views", "DESC"],
       ];
     } else {
-      orderOption = [["startDate", "ASC"]];
+      orderOption = [
+        ["startDate", "ASC"],
+        ["endDate", "ASC"],
+        ["title", "ASC"],
+      ];
     }
     if (category) where.category = category;
     if (location) where.location = location;
@@ -75,14 +83,22 @@ exports.getEvents = async (req, res) => {
       orderOption = [["views", "DESC"]];
     } else if (orderBy === "latest") {
       where.startDate = { [Op.gte]: currentDate() };
-      orderOption = [["startDate", "ASC"]];
+      orderOption = [
+        ["startDate", "ASC"],
+        ["endDate", "ASC"],
+        ["title", "ASC"],
+      ];
     } else if (orderBy === "likes") {
       orderOption = [
         ["likes", "DESC"],
         ["views", "DESC"],
       ];
     } else {
-      orderOption = [["startDate", "ASC"]];
+      orderOption = [
+        ["startDate", "ASC"],
+        ["endDate", "ASC"],
+        ["title", "ASC"],
+      ];
     }
     if (category) where.category = category;
     if (location) where.location = location;
@@ -118,7 +134,6 @@ exports.increaseViewCount = async (req, res, next) => {
 
     event.increment("views", { by: 1 });
 
-    console.log("event", event);
     res.json({
       code: 200,
       payload: event,
