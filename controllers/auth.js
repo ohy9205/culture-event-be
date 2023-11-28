@@ -12,6 +12,13 @@ exports.signUp = async (req, res, next) => {
         message: "이미 가입된 이메일입니다.",
       });
     }
+    const exNick = await User.findOne({ where: { nick } });
+    if (exNick) {
+      return res.json({
+        code: 404,
+        message: "사용중인 닉네임 입니다.",
+      });
+    }
     const hash = await bcrypt.hash(password, 12);
     await User.create({
       email,
