@@ -244,3 +244,32 @@ exports.getEventById = async (req, res, next) => {
     console.error(err);
   }
 };
+
+exports.getEventComments = async (req, res, next) => {
+  const eventId = Number(req.params.id);
+  const { at } = res.locals.user;
+
+  try {
+    const eventInfo = await Event.findByPk(eventId);
+    if (!eventInfo) {
+      return res.status(404).json({
+        result: "fail",
+        message: "이벤트를 찾을 수 없습니다.",
+        payload: {},
+      });
+    }
+
+    const comments = await Comment.findAll({
+      where: { eventId },
+      include: { model: User, attributes: ["email", "nick"] },
+    });
+
+    return res.status(200).json({
+      result: "success",
+      message: "이벤트에 달린 댓글 가져오기 성공",
+      payload: { comments, at },
+    });
+  } catch (err) {
+    next(err);
+  }
+};

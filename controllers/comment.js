@@ -70,9 +70,9 @@ exports.updateComment = async (req, res, next) => {
     await comment.update({ content });
 
     return res.status(200).json({
-      code: 200,
+      result: "success",
       message: "댓글이 정상적으로 수정되었습니다.",
-      content,
+      payload: { content },
     });
   } catch (err) {
     console.error(err);
