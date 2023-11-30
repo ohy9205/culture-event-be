@@ -4,7 +4,6 @@ const User = require("../models/user");
 // TODO 로그인 인증이 필요한 라우터 앞에 붙일 미들웨어 (로그아웃 상태는 관심없음)
 exports.verfiyLoginUser = (req, res, next) => {
   // 로그인 상태를 검증하는 것이기 때문에, at, rt 하나라도 문제 있으면 오류임
-  console.log("req.header", req.header("Authorization"), "rt", req.cookies.rt);
   if (!req.header("Authorization") || !req.cookies.rt) {
     return res.status(401).json({
       result: "fail",
@@ -16,7 +15,6 @@ exports.verfiyLoginUser = (req, res, next) => {
   const accessToken = req.header("Authorization").split(" ")[1];
   const refreshToken = req.cookies.rt;
 
-  console.log("at", accessToken, "rt", refreshToken);
   // 토큰이 존재함 (유효 여부와 관계 없이)
   jwt.verify(accessToken, process.env.JWT_SECRET, async (err, decoded) => {
     if (err) {
