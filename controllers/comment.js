@@ -25,7 +25,7 @@ exports.addComment = async (req, res) => {
     }
     const userId = userExist.id;
 
-    await Comment.create({
+    const createResult = await Comment.create({
       commenter: userId,
       content,
       eventId,
@@ -34,7 +34,7 @@ exports.addComment = async (req, res) => {
     return res.status(201).json({
       result: "success",
       message: "댓글 추가 성공",
-      payload: { content },
+      payload: { commentId: createResult.id, content },
     });
   } catch (err) {
     console.error(err);
