@@ -1,12 +1,6 @@
-// NOTE 댓글은 로그인한 사용자만 달 수 있음!
-// 그렇다면 로그인 검증을 어디서 하느냐? 프론트? 백엔드?
-// '유저 정보'
-
 const Comment = require("../models/comment");
+const Event = require("../models/event");
 const User = require("../models/user");
-
-// 유저 정보를 요청했을 때 유저가 작성한 댓글들이 보여야 한다.
-// 게시글 정보를 요청했을 때, 모든 유저가 작성한 댓글들이 보여야 한다.
 
 exports.addComment = async (req, res) => {
   const { user } = res.locals.user; // 로그인한 사용자 정보
@@ -15,7 +9,19 @@ exports.addComment = async (req, res) => {
   try {
     const userExist = await User.findOne({ where: { email: user.email } });
     if (!userExist) {
-      return res.json({ code: 404, message: "등록되지 않은 회원입니다." });
+      return res.status(404).json({
+        result: "fail",
+        message: "등록되지 않은 회원입니다. (이 메시지가 나오면 연락주세요.)",
+        payload: {},
+      });
+    }
+    const exEvent = await Event.findOne({ where: { id: eventId } });
+    if (!exEvent) {
+      return res.status(404).json({
+        result: "fail",
+        message: "이벤트를 찾을 수 없습니다.",
+        payload: {},
+      });
     }
     const userId = userExist.id;
 
@@ -25,9 +31,14 @@ exports.addComment = async (req, res) => {
       eventId,
     });
 
-    return res.json({ code: 200, message: "댓글 추가 성공" });
+    return res.status(201).json({
+      result: "success",
+      message: "댓글 추가 성공",
+      payload: { content },
+    });
   } catch (err) {
     console.error(err);
+    next(err);
   }
 };
 
@@ -41,16 +52,18 @@ exports.updateComment = async (req, res, next) => {
   try {
     const comment = await Comment.findByPk(commentId);
     if (!comment) {
-      return res.json({
-        code: 404,
+      return res.status(404).json({
+        result: "fail",
         message: "댓글을 찾을 수 없습니다",
+        payload: {},
       });
     }
 
     if (user.id !== comment.commenter) {
-      return res.status(404).json({
-        code: 404,
-        message: "본인이 아닌 사용자가 댓글 수정을 시도합니다.",
+      return res.status(403).json({
+        result: "fail",
+        message: "댓글 수정권한이 없습니다.",
+        payload: {},
       });
     }
 
@@ -74,24 +87,27 @@ exports.deleteComment = async (req, res, next) => {
   try {
     const comment = await Comment.findByPk(commentId);
     if (!comment) {
-      return res.json({
-        code: 404,
+      return res.status(404).json({
+        result: "fail",
         message: "댓글을 찾을 수 없습니다",
+        payload: {},
       });
     }
 
     if (user.id !== comment.commenter) {
-      return res.status(404).json({
-        code: 404,
-        message: "본인이 작성한 댓글만 삭제 가능합니다.",
+      return res.status(403).json({
+        result: "fail",
+        message: "댓글 삭제 권한이 없습니다.",
+        payload: {},
       });
     }
 
     await comment.destroy();
 
-    return res.status(200).json({
-      code: 200,
-      message: "댓글을 정상적으로 삭제하였습니다.",
+    return res.status(204).json({
+      result: "success",
+      message: "댓글이 삭제되었습니다.",
+      payload: {},
     });
   } catch (err) {
     console.error(err);

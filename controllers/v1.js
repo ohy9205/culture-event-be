@@ -7,7 +7,7 @@ const currentDate = () => {
   return new Date().toISOString().slice(0, 10);
 };
 
-exports.getLatestEvent = async (req, res) => {
+exports.getLatestEvent = async (req, res, next) => {
   await Event.findAndCountAll({
     where: {
       startDate: {
@@ -19,42 +19,40 @@ exports.getLatestEvent = async (req, res) => {
     offset: 0,
   })
     .then((events) => {
-      res.json({
-        code: 200,
-        payload: events,
+      res.status(200).json({
+        result: "success",
+        message: "최신순 이벤트 가져오기 성공",
+        payload: {
+          events,
+        },
       });
     })
     .catch((err) => {
       console.error(err);
-      return res.status(500).json({
-        code: 500,
-        message: "서버 에러?",
-      });
+      next(err);
     });
 };
 
-exports.getMostViewsEvent = async (req, res) => {
+exports.getMostViewsEvent = async (req, res, next) => {
   await Event.findAndCountAll({
     order: [["views", "DESC"]],
     limit: 10,
     offset: 0,
   })
     .then((events) => {
-      res.json({
-        code: 200,
-        payload: events,
+      res.status(200).json({
+        result: "success",
+        message: "좋아요 순으로 이벤트 가져오기 성공",
+        payload: { events },
       });
     })
     .catch((err) => {
       console.error(err);
-      return res.status(500).json({
-        code: 500,
-        message: "서버 에러?",
-      });
+      next(err);
     });
 };
 
-exports.getMostLikesEvent = async (req, res) => {
+exports.getMostLikesEvent = async (req, res, next) => {
   await Event.findAndCountAll({
     order: [
       ["likes", "DESC"],
@@ -64,21 +62,19 @@ exports.getMostLikesEvent = async (req, res) => {
     offset: 0,
   })
     .then((events) => {
-      res.json({
-        code: 200,
-        payload: events,
+      res.status(200).json({
+        result: "success",
+        message: "좋아요 순으로 이벤트 가져오기 성공",
+        payload: { events },
       });
     })
     .catch((err) => {
       console.error(err);
-      return res.status(500).json({
-        code: 500,
-        message: "서버 에러?",
-      });
+      next(err);
     });
 };
 
-exports.getEventById = async (req, res) => {
+exports.getEventById = async (req, res, next) => {
   try {
     const eventId = req.params.id;
     const event = await Event.findByPk(eventId, {
@@ -100,16 +96,19 @@ exports.getEventById = async (req, res) => {
 
     if (!event) {
       return res.status(404).json({
-        code: 404,
-        message: "해당 id의 이벤트가 없습니다",
+        result: "fail",
+        message: "이벤트를 찾을 수 없습니다.",
+        payload: {},
       });
     }
 
-    return res.json({
-      code: 200,
-      payload: event,
+    return res.status(200).json({
+      result: "success",
+      message: "이벤트 정보 가져오기 성공",
+      payload: { event },
     });
   } catch (err) {
     console.error(err);
+    next(err);
   }
 };

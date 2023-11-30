@@ -3,17 +3,20 @@ const User = require("../models/user");
 
 // TODO 로그인 인증이 필요한 라우터 앞에 붙일 미들웨어 (로그아웃 상태는 관심없음)
 exports.verfiyLoginUser = (req, res, next) => {
-  const accessToken = req.header("Authorization").split(" ")[1];
-  const refreshToken = req.cookies.rt;
-
   // 로그인 상태를 검증하는 것이기 때문에, at, rt 하나라도 문제 있으면 오류임
-  if (!accessToken || !refreshToken) {
-    return res.json({
-      code: 404,
-      message: "Token이 존재하지 않습니다. 다시 로그인하시기 바랍니다.",
+  console.log("req.header", req.header("Authorization"), "rt", req.cookies.rt);
+  if (!req.header("Authorization") || !req.cookies.rt) {
+    return res.status(401).json({
+      result: "fail",
+      message: "Token Error",
+      payload: {},
     });
   }
 
+  const accessToken = req.header("Authorization").split(" ")[1];
+  const refreshToken = req.cookies.rt;
+
+  console.log("at", accessToken, "rt", refreshToken);
   // 토큰이 존재함 (유효 여부와 관계 없이)
   jwt.verify(accessToken, process.env.JWT_SECRET, async (err, decoded) => {
     if (err) {
@@ -27,17 +30,17 @@ exports.verfiyLoginUser = (req, res, next) => {
             if (err) {
               if (err.name === "TokenExpiredError") {
                 // at, rt 모두 만료되었다.
-                return res.json({
-                  code: 404,
-                  message:
-                    "토큰이 모두 만료되었습니다. 다시 로그인하시기 바랍니다.",
+                return res.status(401).json({
+                  result: "fail",
+                  message: "Token Error",
+                  payload: {},
                 });
               } else {
                 // 만료가 아닌 다른 에러가 있다.
-                return res.json({
-                  code: 404,
-                  message:
-                    "토큰이 유효하지 않습니다. 다시 로그인하시기 바랍니다.",
+                return res.status(401).json({
+                  result: "fail",
+                  message: "Token Error",
+                  payload: {},
                 });
               }
             } else {
@@ -91,11 +94,7 @@ exports.verfiyLoginUser = (req, res, next) => {
                     next();
                   })
                   .catch((err) => {
-                    console.error(err);
-                    return res.status(500).json({
-                      code: 500,
-                      message: "서버 에러?",
-                    });
+                    next(err);
                   });
               } else {
                 const userEmail = decoded.email;
@@ -112,18 +111,19 @@ exports.verfiyLoginUser = (req, res, next) => {
                     next();
                   })
                   .catch((err) => {
-                    console.error(err);
-                    return res.status(500).json({
-                      code: 500,
-                      message: "서버 에러?",
-                    });
+                    next(err);
                   });
               }
             }
           }
         );
       } else {
-        res.status(401).json({ code: 401, message: err.name });
+        // 알수 없는 에러
+        return res.status(401).json({
+          result: "fail",
+          message: "Token Error!",
+          payload: {},
+        });
       }
     } else {
       // at 유효, rt 검증
@@ -138,7 +138,6 @@ exports.verfiyLoginUser = (req, res, next) => {
           if (err.name === "TokenExpiredError") {
             // at 유효, rt 만료 이게 가능한 상황인가...
             // rt 갱신하고 데이터 보내주기
-
             const newRefreshToken = jwt.sign(
               {
                 id: exUserId,
@@ -152,6 +151,7 @@ exports.verfiyLoginUser = (req, res, next) => {
             );
 
             const userEmail = decoded.email;
+
             await User.findOne({
               where: { email: userEmail },
               attributes: ["id", "email", "nick"],
@@ -169,24 +169,20 @@ exports.verfiyLoginUser = (req, res, next) => {
                 next();
               })
               .catch((err) => {
-                console.error(err);
-                return res.status(500).json({
-                  code: 500,
-                  message: "서버 에러?",
-                });
+                next(err);
               });
           } else {
             // at 유효, rt가 유효하지 않은 토큰
             // 다시 로그인하시오
-            return res.json({
-              code: 404,
-              message: "토큰이 유효하지 않습니다. 다시 로그인하시기 바랍니다.",
+            return res.status(401).json({
+              result: "fail",
+              message: "Token Error",
+              payload: {},
             });
           }
         } else {
           // 에러 없음
           // rt 확인만하고 데이터 보내주기
-
           if (daysUntilExpiration < 7) {
             const newRefreshToken = jwt.sign(
               {
@@ -219,11 +215,7 @@ exports.verfiyLoginUser = (req, res, next) => {
                 next();
               })
               .catch((err) => {
-                console.error(err);
-                return res.status(500).json({
-                  code: 500,
-                  message: "서버 에러?",
-                });
+                next(err);
               });
           } else {
             const userEmail = decoded.email;
@@ -240,10 +232,7 @@ exports.verfiyLoginUser = (req, res, next) => {
               })
               .catch((err) => {
                 console.error(err);
-                return res.status(500).json({
-                  code: 500,
-                  message: "서버 에러?",
-                });
+                next(err);
               });
           }
         }

@@ -6,7 +6,9 @@ const currentDate = () => {
   return new Date().toISOString().slice(0, 10);
 };
 
-exports.getEvents = async (req, res) => {
+exports.getEvents = async (req, res, next) => {
+  const { at } = res.locals.user;
+
   if (req.query.pageIndex && req.query.pageSize) {
     // 페이지네이션 사용
     const pageIndex = Number(req.query.pageIndex);
@@ -58,18 +60,19 @@ exports.getEvents = async (req, res) => {
       offset: offset,
     })
       .then((events) => {
-        res.json({
-          code: 200,
-          totalPage: Math.ceil(events.count / pageSize),
-          payload: events,
+        res.status(200).json({
+          result: "success",
+          message: "이벤트 정보 가져오기 성공",
+          payload: {
+            totalPage: Math.ceil(events.count / pageSize),
+            events,
+            at,
+          },
         });
       })
       .catch((err) => {
         console.error(err);
-        return res.status(500).json({
-          code: 500,
-          message: "서버 에러?",
-        });
+        next(err);
       });
   } else {
     // 페이지네이션 사용 X
@@ -113,17 +116,18 @@ exports.getEvents = async (req, res) => {
       where,
     })
       .then((events) => {
-        res.json({
-          code: 200,
-          payload: events,
+        res.status(200).json({
+          result: "success",
+          message: "이벤트 정보 가져오기 성공",
+          payload: {
+            events,
+            at,
+          },
         });
       })
       .catch((err) => {
         console.error(err);
-        return res.status(500).json({
-          code: 500,
-          message: "서버 에러?",
-        });
+        next(err);
       });
   }
 };
@@ -131,12 +135,14 @@ exports.getEvents = async (req, res) => {
 exports.increaseViewCount = async (req, res, next) => {
   try {
     const event = res.locals.event;
+    const { at } = res.locals.user;
 
     event.increment("views", { by: 1 });
 
-    res.json({
-      code: 200,
-      payload: event,
+    return res.status(200).json({
+      result: "success",
+      message: "이벤트 정보 가져오기 성공",
+      payload: { event, at },
     });
   } catch (error) {
     console.error(error);
@@ -146,7 +152,7 @@ exports.increaseViewCount = async (req, res, next) => {
 
 exports.toggleLikeState = async (req, res, next) => {
   // NOTE 필요한것 유저 정보, 이벤트 아이디
-  const { user } = res.locals.user;
+  const { user, at } = res.locals.user;
   const userId = user.id;
   const eventId = Number(req.params.id);
 
@@ -157,9 +163,17 @@ exports.toggleLikeState = async (req, res, next) => {
       where: { id: userId },
       include: [{ model: Event, through: "favoriteEvent" }],
     });
-
     const eventInfo = await Event.findByPk(eventId);
-    // userInfo가 없는 경우
+
+    if (!eventInfo) {
+      return res.status(404).json({
+        result: "fail",
+        message: "이벤트를 찾을 수 없습니다",
+        payload: {
+          at,
+        },
+      });
+    }
     const likedList = userInfo.Events;
     const isLiked = likedList.some((event) => {
       return event.id === eventId;
@@ -168,18 +182,26 @@ exports.toggleLikeState = async (req, res, next) => {
     if (isLiked) {
       await userInfo.removeEvents(eventId);
       await eventInfo.decrement("likes", { by: 1 });
-      return res.json({
-        code: 200,
+      console.log("remove eventInfo", await eventInfo.views);
+      return res.status(201).json({
+        result: "success",
         message: `이벤트 ${eventId}를 좋아요에서 삭제했습니다.`,
+        payload: {
+          at,
+          eventLikesCount: eventInfo.views - 1,
+        },
       });
     } else {
-      // 좋아하는 이벤트가 아닌 경우, 추가
       await userInfo.addEvents(eventId);
       await eventInfo.increment("likes", { by: 1 });
-      console.log(`이벤트 ${eventId}를 좋아요에 추가했습니다.`);
-      return res.json({
-        code: 200,
+      console.log("add eventInfo", await eventInfo.views);
+      return res.status(201).json({
+        result: "success",
         message: `이벤트 ${eventId}를 좋아요에서 추가했습니다.`,
+        payload: {
+          at,
+          eventLikesCount: eventInfo.views + 1,
+        },
       });
     }
   } catch (err) {
@@ -210,8 +232,9 @@ exports.getEventById = async (req, res, next) => {
 
     if (!event) {
       return res.status(404).json({
-        code: 404,
-        message: "해당 id의 이벤트가 없습니다",
+        result: "fail",
+        message: "이벤트를 찾을 수 없습니다.",
+        payload: {},
       });
     }
 
