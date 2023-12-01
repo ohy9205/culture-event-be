@@ -104,7 +104,7 @@ exports.deleteComment = async (req, res, next) => {
 
     await comment.destroy();
 
-    return res.status(204).json({
+    return res.status(200).json({
       result: "success",
       message: "댓글이 삭제되었습니다.",
       payload: {},

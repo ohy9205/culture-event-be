@@ -182,28 +182,22 @@ exports.toggleLikeState = async (req, res, next) => {
     if (isLiked) {
       await userInfo.removeEvents(eventId);
       await eventInfo.decrement("likes", { by: 1 });
-      console.log("remove eventInfo", await eventInfo.views);
-      return res.status(201).json({
-        result: "success",
-        message: `이벤트 ${eventId}를 좋아요에서 삭제했습니다.`,
-        payload: {
-          at,
-          eventLikesCount: eventInfo.views - 1,
-        },
-      });
     } else {
       await userInfo.addEvents(eventId);
       await eventInfo.increment("likes", { by: 1 });
-      console.log("add eventInfo", await eventInfo.views);
-      return res.status(201).json({
-        result: "success",
-        message: `이벤트 ${eventId}를 좋아요에서 추가했습니다.`,
-        payload: {
-          at,
-          eventLikesCount: eventInfo.views + 1,
-        },
-      });
     }
+    const updateEventInfo = await Event.findByPk(eventId);
+
+    return res.status(201).json({
+      result: "success",
+      message: `이벤트 ${eventId}를 좋아요에서 ${
+        isLiked ? "삭제" : "추가"
+      }했습니다.`,
+      payload: {
+        at,
+        eventLikesCount: updateEventInfo.likes, // 변경된 값 사용
+      },
+    });
   } catch (err) {
     console.error(err);
     next(err);

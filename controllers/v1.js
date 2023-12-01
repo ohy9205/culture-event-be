@@ -42,7 +42,7 @@ exports.getMostViewsEvent = async (req, res, next) => {
     .then((events) => {
       res.status(200).json({
         result: "success",
-        message: "좋아요 순으로 이벤트 가져오기 성공",
+        message: "조회수 순으로 이벤트 가져오기 성공",
         payload: { events },
       });
     })

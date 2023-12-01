@@ -8,7 +8,7 @@ exports.getUserMe = async (req, res) => {
   return res.status(200).json({
     result: "success",
     message: "유저 정보를 가져오는데 성공했습니다.",
-    payload: { ...user, at },
+    payload: { user, at },
   });
 };
 
@@ -44,7 +44,7 @@ exports.getUserComments = async (req, res, next) => {
       result: "success",
       message: "사용자가 작성한 댓글들을 모두 가져왔습니다.",
       payload: {
-        ...commentsWithEvents,
+        commentsWithEvents,
         at,
       },
     });
