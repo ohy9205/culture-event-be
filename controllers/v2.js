@@ -207,6 +207,7 @@ exports.toggleLikeState = async (req, res, next) => {
 exports.getEventById = async (req, res, next) => {
   try {
     const eventId = req.params.id;
+    const { at } = res.locals.user;
     const event = await Event.findByPk(eventId, {
       include: [
         {
@@ -228,7 +229,7 @@ exports.getEventById = async (req, res, next) => {
       return res.status(404).json({
         result: "fail",
         message: "이벤트를 찾을 수 없습니다.",
-        payload: {},
+        payload: { at },
       });
     }
 
