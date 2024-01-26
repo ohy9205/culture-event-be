@@ -15,12 +15,4 @@ module.exports = {
     host: "127.0.0.1",
     dialect: "mysql",
   },
-  production: {
-    username: "root",
-    password: process.env.DATABASE_PASSWORD,
-    database: "railway",
-    host: "roundhouse.proxy.rlwy.net",
-    port: 20765,
-    dialect: "mysql",
-  },
 };

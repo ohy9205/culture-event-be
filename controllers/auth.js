@@ -104,10 +104,15 @@ exports.signIn = async (req, res, next) => {
             issuer: "mk",
           }
         );
+
         res
           .status(200)
           .cookie("rt", refreshToken, {
-            // path: "/",
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+          })
+          .cookie("at", token, {
             httpOnly: true,
             secure: true,
             sameSite: "none",
@@ -119,7 +124,7 @@ exports.signIn = async (req, res, next) => {
               id: exUser.id,
               email: exUser.email,
               nick: exUser.nick, // nick 정상적으로 보내지는지 확인 필요
-              at: token,
+              // at: token,
             },
           });
       }
@@ -128,4 +133,27 @@ exports.signIn = async (req, res, next) => {
     console.error(error);
     next(error);
   }
+};
+
+exports.signOut = async (req, res, next) => {
+  console.log("signOut호출?");
+  try {
+  } catch (error) {}
+  res
+    .clearCookie("rt", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    })
+    .clearCookie("at", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+    })
+    .json({
+      result: "success",
+      message: "로그아웃 성공",
+      payload: {},
+    })
+    .send();
 };
