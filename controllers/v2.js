@@ -18,7 +18,7 @@ exports.getEvents = async (req, res, next) => {
     if (pageIndex > 1) {
       offset = pageSize * (pageIndex - 1);
     }
-    const { category, location, isfree, keyword, start, end, orderBy } =
+    const { category, location, isFree, keyword, start, end, orderBy } =
       req.query;
 
     let where = {};
@@ -47,7 +47,7 @@ exports.getEvents = async (req, res, next) => {
     }
     if (category) where.category = category;
     if (location) where.location = location;
-    if (isfree) where.isFree = isfree === "무료";
+    if (isFree) where.isFree = isFree === "무료";
     if (keyword) where.title = { [Op.like]: `%${keyword}%` };
     if (start && end) {
       where.startDate = { [Op.gte]: start, [Op.lte]: end };
@@ -76,7 +76,7 @@ exports.getEvents = async (req, res, next) => {
       });
   } else {
     // 페이지네이션 사용 X
-    const { category, location, isfree, keyword, start, end, orderBy } =
+    const { category, location, isFree, keyword, start, end, orderBy } =
       req.query;
 
     let where = {};
@@ -105,7 +105,7 @@ exports.getEvents = async (req, res, next) => {
     }
     if (category) where.category = category;
     if (location) where.location = location;
-    if (isfree) where.isFree = isfree === "무료";
+    if (isFree) where.isFree = isFree === "무료";
     if (keyword) where.title = { [Op.like]: `%${keyword}%` };
     if (start && end) {
       where.startDate = { [Op.gte]: start, [Op.lte]: end };

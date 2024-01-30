@@ -13,16 +13,12 @@ exports.getInitialData = async () => {
   Event.count()
     .then(async (count) => {
       if (count === 0) {
-        console.log("테이블에 데이터가 없습니다. 초기화를 실행합니다");
         this.getEventData();
       } else {
-        console.log(`테이블에 ${count}개의 데이터가 있습니다.`);
         await destroyData();
       }
     })
-    .catch((err) => {
-      console.error("데이터 수 조회중 오류 발생", err);
-    });
+    .catch((err) => {});
 };
 
 exports.getEventData = async () => {
@@ -71,18 +67,14 @@ const destroyData = async () => {
       expiredEvent.forEach((event) => {
         event.destroy();
       });
-      console.log(`${expiredEvent.length}개의 이벤트가 삭제되었습니다.`);
     } else {
-      console.log("기간이 지난 이벤트가 없습니다.");
     }
   });
 };
 
 exports.getNewEventData = async () => {
   await destroyData();
-  console.log("destroy data finished");
   const today = currentDate();
-  console.log("today =>", today);
 
   const response = await axios.get(
     `http://openapi.seoul.go.kr:8088/${process.env.API_KEY}/json/culturalEventInfo/1/1000`
@@ -90,10 +82,10 @@ exports.getNewEventData = async () => {
   const eventData = response.data.culturalEventInfo.row;
 
   const newEvent = eventData.filter((data) => {
-    if (data.RGSTDATE.split(" ")[0] === today) {
-      console.log("등록일", data.RGSTDATE.split(" ")[0]);
-      console.log("오늘날짜", today);
-    }
+    // if (data.RGSTDATE.split(" ")[0] === today) {
+    //   console.log("등록일", data.RGSTDATE.split(" ")[0]);
+    //   console.log("오늘날짜", today);
+    // }
 
     return data.RGSTDATE.split(" ")[0] === today;
   });

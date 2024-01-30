@@ -4,6 +4,7 @@ const User = require("../models/user");
 // TODO 로그인 인증이 필요한 라우터 앞에 붙일 미들웨어 (로그아웃 상태는 관심없음)
 exports.verfiyLoginUser = (req, res, next) => {
   // 로그인 상태를 검증하는 것이기 때문에, at, rt 하나라도 문제 있으면 오류임
+  console.log(req.cookies.at);
   if (!req.cookies.at || !req.cookies.rt) {
     return res.status(401).json({
       result: "fail",
@@ -20,7 +21,6 @@ exports.verfiyLoginUser = (req, res, next) => {
     if (err) {
       if (err.name === "TokenExpiredError") {
         // at 만료
-        console.log("at 만료");
         jwt.verify(
           refreshToken,
           process.env.RT_SECRET,
@@ -125,7 +125,6 @@ exports.verfiyLoginUser = (req, res, next) => {
       }
     } else {
       // at 유효, rt 검증
-      console.log("at 유효");
       jwt.verify(refreshToken, process.env.RT_SECRET, async (err, decoded) => {
         const expirationDate = new Date(decoded.exp * 1000);
         const currentDate = new Date();

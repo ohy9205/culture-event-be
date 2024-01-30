@@ -136,7 +136,6 @@ exports.signIn = async (req, res, next) => {
 };
 
 exports.signOut = async (req, res, next) => {
-  console.log("signOut호출?");
   try {
   } catch (error) {}
   res
