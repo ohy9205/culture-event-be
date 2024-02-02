@@ -7,8 +7,6 @@ const currentDate = () => {
 };
 
 exports.getEvents = async (req, res, next) => {
-  const { at } = res.locals.user;
-
   if (req.query.pageIndex && req.query.pageSize) {
     // 페이지네이션 사용
     const pageIndex = Number(req.query.pageIndex);
@@ -66,7 +64,6 @@ exports.getEvents = async (req, res, next) => {
           payload: {
             totalPage: Math.ceil(events.count / pageSize),
             events,
-            at,
           },
         });
       })
@@ -121,7 +118,6 @@ exports.getEvents = async (req, res, next) => {
           message: "이벤트 정보 가져오기 성공",
           payload: {
             events,
-            at,
           },
         });
       })
@@ -152,7 +148,7 @@ exports.increaseViewCount = async (req, res, next) => {
 
 exports.toggleLikeState = async (req, res, next) => {
   // NOTE 필요한것 유저 정보, 이벤트 아이디
-  const { user, at } = res.locals.user;
+  const { user } = res.locals.user;
   const userId = user.id;
   const eventId = Number(req.params.id);
 
@@ -169,9 +165,7 @@ exports.toggleLikeState = async (req, res, next) => {
       return res.status(404).json({
         result: "fail",
         message: "이벤트를 찾을 수 없습니다",
-        payload: {
-          at,
-        },
+        payload: {},
       });
     }
     const likedList = userInfo.Events;
@@ -188,13 +182,37 @@ exports.toggleLikeState = async (req, res, next) => {
     }
     const updateEventInfo = await Event.findByPk(eventId);
 
+    // 토글한이벤트 데이터
+    // const rs = await getEventById(req, res, next);
+    const event = await Event.findByPk(eventId, {
+      include: [
+        {
+          model: Comment,
+          include: {
+            model: User,
+            attributes: ["email", "nick"],
+          },
+        },
+        {
+          model: User,
+          through: "favoriteEvent",
+          attributes: ["email", "nick"],
+        },
+      ],
+    });
+
     return res.status(201).json({
       result: "success",
       message: `이벤트 ${eventId}를 좋아요에서 ${
         isLiked ? "삭제" : "추가"
       }했습니다.`,
       payload: {
-        at,
+        event: {
+          id: event.dataValues.id,
+          title: event.dataValues.title,
+          period: event.dataValues.eventPeriod,
+          thumbnail: event.dataValues.thumbnail,
+        },
         eventLikesCount: updateEventInfo.likes, // 변경된 값 사용
       },
     });
@@ -207,7 +225,6 @@ exports.toggleLikeState = async (req, res, next) => {
 exports.getEventById = async (req, res, next) => {
   try {
     const eventId = req.params.id;
-    const { at } = res.locals.user;
     const event = await Event.findByPk(eventId, {
       include: [
         {
@@ -229,7 +246,7 @@ exports.getEventById = async (req, res, next) => {
       return res.status(404).json({
         result: "fail",
         message: "이벤트를 찾을 수 없습니다.",
-        payload: { at },
+        payload: {},
       });
     }
 
@@ -242,7 +259,6 @@ exports.getEventById = async (req, res, next) => {
 
 exports.getEventComments = async (req, res, next) => {
   const eventId = Number(req.params.id);
-  const { at } = res.locals.user;
 
   try {
     const eventInfo = await Event.findByPk(eventId);
@@ -262,7 +278,7 @@ exports.getEventComments = async (req, res, next) => {
     return res.status(200).json({
       result: "success",
       message: "이벤트에 달린 댓글 가져오기 성공",
-      payload: { comments, at },
+      payload: { comments },
     });
   } catch (err) {
     next(err);

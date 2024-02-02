@@ -8,7 +8,7 @@ exports.getUserMe = async (req, res) => {
   return res.status(200).json({
     result: "success",
     message: "유저 정보를 가져오는데 성공했습니다.",
-    payload: { user, at },
+    payload: { user },
   });
 };
 
@@ -45,7 +45,6 @@ exports.getUserComments = async (req, res, next) => {
       message: "사용자가 작성한 댓글들을 모두 가져왔습니다.",
       payload: {
         commentsWithEvents,
-        at,
       },
     });
   } catch (err) {
@@ -80,7 +79,6 @@ exports.getUserLikeEvent = async (req, res, next) => {
       message: "사용자가 좋아하는 게시글을 모두 가져왔습니다.",
       payload: {
         data,
-        at,
       },
     });
   } catch (err) {

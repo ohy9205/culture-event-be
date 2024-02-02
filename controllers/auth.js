@@ -124,7 +124,6 @@ exports.signIn = async (req, res, next) => {
               id: exUser.id,
               email: exUser.email,
               nick: exUser.nick, // nick 정상적으로 보내지는지 확인 필요
-              // at: token,
             },
           });
       }
