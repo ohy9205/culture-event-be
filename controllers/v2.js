@@ -207,6 +207,7 @@ exports.toggleLikeState = async (req, res, next) => {
         isLiked ? "삭제" : "추가"
       }했습니다.`,
       payload: {
+        action: isLiked ? "remove" : "add",
         event: {
           id: event.dataValues.id,
           title: event.dataValues.title,
