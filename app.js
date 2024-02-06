@@ -77,11 +77,37 @@ app.use((err, req, res, next) => {
   res.locals.error = process.env.NODE_ENV !== "production" ? err : {};
   res.status(err.status || 500);
   res.json({
-    result: 'fail',
+    result: "fail",
     message: `${err.message}`,
   });
 });
 
-app.listen(app.get("port"), () => {
+const server = app.listen(app.get("port"), () => {
   console.log(app.get("port"), "번 포트에서 대기 중");
 });
+
+// Gracefully closing the database connection
+function gracefulShutdown() {
+  console.log("Closing server...");
+  server.close(() => {
+    console.log("Server closed.");
+
+    console.log("Closing database connection...");
+    sequelize
+      .close()
+      .then(() => {
+        console.log("Database connection closed.");
+        process.exit(0);
+      })
+      .catch((err) => {
+        console.error("Error during database connection close:", err);
+        process.exit(1);
+      });
+  });
+}
+
+// Listen for TERM signal .e.g. kill
+process.on("SIGTERM", gracefulShutdown);
+
+// Listen for INT signal e.g. Ctrl-C
+process.on("SIGINT", gracefulShutdown);
