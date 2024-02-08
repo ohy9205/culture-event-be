@@ -1,4 +1,5 @@
 const Sequelize = require("sequelize");
+require("regenerator-runtime/runtime.js");
 
 class Event extends Sequelize.Model {
   static initiate(sequelize) {

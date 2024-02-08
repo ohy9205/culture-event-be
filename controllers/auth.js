@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+require("regenerator-runtime/runtime.js");
 
 exports.signUp = async (req, res, next) => {
   const { email, nick, password } = req.body;

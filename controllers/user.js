@@ -1,6 +1,7 @@
 const Comment = require("../models/comment");
 const Event = require("../models/event");
 const User = require("../models/user");
+require("regenerator-runtime/runtime.js");
 
 exports.getUserMe = async (req, res) => {
   const { code, user, at } = res.locals.user;

@@ -1,6 +1,7 @@
 const Comment = require("../models/comment");
 const Event = require("../models/event");
 const User = require("../models/user");
+require("regenerator-runtime/runtime.js");
 
 exports.addComment = async (req, res) => {
   const { user } = res.locals.user; // 로그인한 사용자 정보

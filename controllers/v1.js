@@ -2,6 +2,7 @@ const Event = require("../models/event");
 const User = require("../models/user");
 const { Op } = require("sequelize");
 const Comment = require("../models/comment");
+require("regenerator-runtime/runtime.js");
 
 const currentDate = () => {
   return new Date().toISOString().slice(0, 10);

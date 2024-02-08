@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+require("regenerator-runtime/runtime.js");
 
 // TODO 로그인 인증이 필요한 라우터 앞에 붙일 미들웨어 (로그아웃 상태는 관심없음)
 exports.verfiyLoginUser = (req, res, next) => {

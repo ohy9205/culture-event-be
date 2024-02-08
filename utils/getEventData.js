@@ -1,6 +1,7 @@
 const { Event } = require("../models");
 const axios = require("axios");
 const { Op } = require("sequelize");
+require("regenerator-runtime/runtime.js");
 
 const currentDate = () => {
   return new Date().toISOString().slice(0, 10);

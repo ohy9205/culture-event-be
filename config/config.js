@@ -2,17 +2,19 @@ require("dotenv").config();
 
 module.exports = {
   development: {
-    username: "root",
+    username: "ohy1015",
     password: process.env.SEQUELIZE_PASSWORD,
-    database: "seoul_event",
-    host: "127.0.0.1",
-    dialect: "mysql",
+    database: "ygrdb",
+    host: "3.38.147.210",
+    dialect: "postgres",
+    schema: "public",
+    port: "11015",
   },
-  test: {
-    username: "root",
-    password: process.env.SEQUELIZE_PASSWORD,
-    database: "nodejs",
-    host: "127.0.0.1",
-    dialect: "mysql",
-  },
+  // test: {
+  //   username: "root",
+  //   password: process.env.SEQUELIZE_PASSWORD,
+  //   database: "nodejs",
+  //   host: "127.0.0.1",
+  //   dialect: "mysql",
+  // },
 };
