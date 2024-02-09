@@ -134,3 +134,6 @@ dist
 
 # Sequelize
 /migrations
+
+#key
+yeon.pem

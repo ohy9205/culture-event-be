@@ -54,7 +54,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.use(
   cors({
-    origin: true,
+    origin: ["http://localhost:3030", "http://localhost:80"],
     credentials: true,
   })
 );
@@ -82,7 +82,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-const server = app.listen(app.get("port"), () => {
+const server = app.listen(80, () => {
   console.log(app.get("port"), "번 포트에서 대기 중");
 });
 
