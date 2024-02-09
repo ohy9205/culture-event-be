@@ -54,7 +54,10 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:80"],
+    origin: [
+      "http://localhost:3000",
+      "https://culture-event-fe-refactor.vercel.app",
+    ],
     credentials: true,
   })
 );
